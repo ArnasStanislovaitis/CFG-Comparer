@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\iot3\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\iot3\\.nuget\\packages"
+    ]
+  }
+}
