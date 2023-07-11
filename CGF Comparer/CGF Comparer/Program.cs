@@ -21,20 +21,55 @@ namespace CGF_Comparer
             using var stream = new MemoryStream();
             string path = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB001-default";
             string pathSecond = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB920-default";
-
+             // File names
             string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
             var names = Directory.GetFiles(dataDirectory);
-           
-            foreach (string name in names)
+
+            int choice = 0;
+            for (int i = 0; i < names.Length; i++) {
+                //Console.WriteLine(Path.GetFileName(names[i]));                
+            }
+            // Menu
+            Console.WriteLine("Choose a source file:");
+            //var input = Console.ReadLine();
+            PrintFileNames(names,choice);
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice > names.Length || choice < 1 )
             {
-                Console.WriteLine(Path.GetFileName(name));
-                if(File.Exists(name))
-                {
-                    Console.WriteLine( "Yra");
-                }
+                Console.WriteLine($"Invalid input. Please enter an integer value between {1} and {names.Length} : ");
+                PrintFileNames(names,choice);
             }
 
+            Console.WriteLine( choice);
+
+            void PrintFileNames(string[] names,int choice)
+            { 
+                for (int i = 0; i < names.Length; i++)
+                {
+                    if(choice - 1 == i) { continue; }
+                    Console.WriteLine($"{i + 1}. {Path.GetFileName(names[i])}");
+                }
+            }
             
+            string sourcePath = string.Empty;
+            string targetPath = string.Empty;
+
+            sourcePath = names[choice - 1];
+            int previousChoice = 0;
+            previousChoice = choice;
+            choice = 0;
+
+            Console.WriteLine( sourcePath);
+            Console.WriteLine("Choose a target file");
+            PrintFileNames(names, previousChoice);
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice > names.Length || choice < 1 || choice == previousChoice)
+            {     
+                  Console.WriteLine($"Invalid input. Please enter an integer value between {1} and {names.Length} : ");
+                  PrintFileNames(names, choice);
+            }
+            targetPath = names[choice - 1];
+            Console.WriteLine( targetPath);
+
+
             stream.Position = 0;
             int bufferSize = 512;
             byte[] decompressedBytes = new byte[bufferSize];
@@ -52,8 +87,8 @@ namespace CGF_Comparer
             Dictionary<string, string> map2 = new Dictionary<string, string>();
             List<ConfigurationData> allData = new List<ConfigurationData>();
             //StreamReader sr = new StreamReader(stream);
-            TextReader textReader = File.OpenText(path);
-            TextReader textReader2 = File.OpenText(pathSecond);
+            TextReader textReader = File.OpenText(sourcePath);
+            TextReader textReader2 = File.OpenText(targetPath);
             //sr.Close();
             //var a = sr.Read();
             var allText = textReader.ReadToEnd();
@@ -148,18 +183,20 @@ namespace CGF_Comparer
             foreach(var key in keysNotInTarget)
             {
                 Console.WriteLine($"Nera antram {key.Key} {key.Value}");
+                
             }
             //if(map.ContainsKey())
             var o = allData.Where(x => x.ID.StartsWith("40")).Select(x=>x);  //Filter by ID
             var e = allData.Where(x => x.Type == "added").ToArray();
             var y = allData.Where(x => x.Type == "added").ToArray();
+
             foreach (var key in o)
             {
-                Console.WriteLine($"Atfiltruoti {key.ID}");
+                //Console.WriteLine($"Atfiltruoti {key.ID}");
             }
             foreach (var item in y)
             {
-                Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+                //Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
             }
             /*
             foreach (var item in map)
