@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "Mdamjw7PwXkY1W+uWixaSLEFqqwzRGSfTczcXKN8wOTtbT/vnWx2Yq4Odv3wl+slqcOTApPiVvakQp1WrYD6Aw==",
+  "dgSpecHash": "kpqKTh/f7p7cZ/PleG3UxT679dgzT41GxmuWdpsOVO3ij3R27kqldy6JkEwxx5nhJb75aV20RwccK6DziMskMA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\iot3\\Documents\\GitHub\\CFG-Comparer\\CGF Comparer\\CGF Comparer\\CGF Comparer.csproj",
+  "projectFilePath": "C:\\Users\\Arnas\\Documents\\GitHub\\CFG-Comparer\\CGF Comparer\\CGF Comparer\\CGF Comparer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\iot3\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
-    "C:\\Users\\iot3\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
-    "C:\\Users\\iot3\\.nuget\\packages\\system.io\\4.3.0\\system.io.4.3.0.nupkg.sha512",
-    "C:\\Users\\iot3\\.nuget\\packages\\system.runtime\\4.3.0\\system.runtime.4.3.0.nupkg.sha512",
-    "C:\\Users\\iot3\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
-    "C:\\Users\\iot3\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
+    "C:\\Users\\Arnas\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Arnas\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\Arnas\\.nuget\\packages\\system.io\\4.3.0\\system.io.4.3.0.nupkg.sha512",
+    "C:\\Users\\Arnas\\.nuget\\packages\\system.runtime\\4.3.0\\system.runtime.4.3.0.nupkg.sha512",
+    "C:\\Users\\Arnas\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
+    "C:\\Users\\Arnas\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
   ],
   "logs": []
 }

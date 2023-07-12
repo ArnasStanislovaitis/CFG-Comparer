@@ -14,12 +14,13 @@ namespace CGF_Comparer
 
             return allData;
         }
-        public void CompareFiles(string[] IdValuePair, Dictionary<string,string> sourceKeyValues) {            
+        public void CompareFiles(string[] IdValuePairs, Dictionary<string,string> sourceKeyValues) {            
 
-            for (int i = 6; i < IdValuePair.Length - 1; i++)
-            {                
+            for (int i = 6; i < IdValuePairs.Length - 1; i++)
+            {   
+                var IdValuePair = IdValuePairs[i].Split(":");             
                 targetKeyValuePairs.Add(IdValuePair[0], IdValuePair[1]);
-
+                
                 if (sourceKeyValues.ContainsKey(IdValuePair[0]) && sourceKeyValues[IdValuePair[0]] == IdValuePair[1])
                 {
                     allData.Add(new ModelCFG

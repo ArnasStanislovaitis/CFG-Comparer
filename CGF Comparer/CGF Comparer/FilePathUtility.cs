@@ -54,11 +54,11 @@ namespace CGF_Comparer
         }
         public string[] GetDataFileNames()
         {
-            string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";            
+            //string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
             var fileNames = Directory.GetFiles(dataDirectory);
 
             return fileNames;
         }
-    }
-        
+    }        
 }

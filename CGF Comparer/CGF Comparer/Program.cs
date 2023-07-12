@@ -14,8 +14,8 @@ namespace CGF_Comparer
             using var stream = new MemoryStream();
             
             // File names
-            string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
-            //string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
+            //string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
             var names = Directory.GetFiles(dataDirectory);
 
             
@@ -30,13 +30,8 @@ namespace CGF_Comparer
             // using var decompressor = new GZipStream(File.Open(path,FileMode.Open), CompressionMode.Decompress);
             //int length = decompressor.Read(decompressedBytes, 0, bufferSize);
 
-            //decompressor.Close();
-            //Console.WriteLine(length);
-
-            int unchanged = 0;
-            int modified = 0;
-            int removed = 0;
-            int added = 0;
+            //decompressor.Close();            
+            
             Dictionary<string,string> map = new Dictionary<string,string>();
             Dictionary<string, string> map2 = new Dictionary<string, string>();
             List<ModelCFG> allData = new List<ModelCFG>();
@@ -50,84 +45,115 @@ namespace CGF_Comparer
 
             string[] first = allText.Split(";");
             string[] second = allText2.Split(";");
+                       
             
-            
-            
-            foreach ( string line in first)
-            {                               
-                //Console.WriteLine( line);                
-            }
-            
-            for (int i = 6; i < first.Length - 1 ; i++)
-            {
-                
-                var a = first[i].Split(":");                
-                map.Add(a[0], a[1]);  
-            }
-
-            int ad = 0;
-            int un = 0;
-            int mo = 0;
-            int re = 0;
+           
+                        
             ReadCFG readCFG = new ReadCFG();
-            var da = readCFG.ReadCFGFile(k.Item1);
-            var dod = readCFG.ReadCFGFile(k.Item2);
+            var src = readCFG.ReadCFGFile(k.Item1);
+            var tar = readCFG.ReadCFGFile(k.Item2);
             
-            var sourced = readCFG.GetSourceFileValues(da);
+            var sourced = readCFG.GetSourceFileValues(src);
             DataComparison dc = new();
+            
+           
 
-            var all = dc.GetComparedData(dod, sourced);
+            var all = dc.GetComparedData(tar, sourced);
+
+
+            Output ou = new();
+            HashSet<string> choices = new();
+            string input = string.Empty;
+            while(input != "6")
+            {
+                Console.WriteLine("1. Unchanged");
+                Console.WriteLine("2. Removed");
+                Console.WriteLine("3. Added");
+                Console.WriteLine("4. Modified");
+                Console.WriteLine("5. Print with filters");
+                Console.WriteLine("6. Back");
+                input = Console.ReadLine();
+                Console.Clear();
+                if (input == "5")
+                {
+                    foreach (var item in choices)
+                    {
+                        FilterCall(all, item);
+                    }
+                }
+                else if (!choices.Contains(input))
+                {
+                    choices.Add(input);
+                }
+                else
+                {
+                    Console.WriteLine("Wrong choice");
+                }
+                
+            }
+            void FilterCall(List<ModelCFG> data, string choice)
+            {
+                if(choice == "1") {
+                    var filtered = UnchangedFilter(data);
+                    ou.PrintAllData(filtered);
+                }
+                else if(choice == "2")
+                {
+                    var filtered = RemovedFilter(data);
+                    ou.PrintAllData(filtered);
+                }
+                else if(choice == "3")
+                {
+                    var filtered = AddedFilter(data);
+                    ou.PrintAllData(filtered);
+                }
+                else if(choice == "4")
+                {
+                    var filtered = ModifiedFilter(data);
+                    ou.PrintAllData(filtered);
+                }
+                
+            }
+            IEnumerable<ModelCFG> UnchangedFilter(List<ModelCFG> data)
+            {
+                var unchangedCount = data.Where(x => x.Type == "unchanged");
+
+                return unchangedCount;
+            }
+            IEnumerable<ModelCFG> AddedFilter(List<ModelCFG> data)
+            {
+                var addedCount = data.Where(x => x.Type == "added");
+
+                return addedCount;
+            }
+            IEnumerable<ModelCFG> ModifiedFilter(List<ModelCFG> data)
+            {
+                var modifiedCount = data.Where(x => x.Type == "modified");
+
+                return modifiedCount;
+            }
+            IEnumerable<ModelCFG> RemovedFilter(List<ModelCFG> data)
+            {
+                var removedCount = data.Where(x => x.Type == "removed");
+
+                return removedCount;
+            }
+                        
+
+
             foreach (var item in all)
             {
-                Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+                //Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+                
             }
-            /*
-            for (int i = 6; i < second.Length - 1; i++)
-            {
-
-                var IdValuePair = second[i].Split(":");
-                map2.Add(IdValuePair[0], IdValuePair[1]);
-                if (map.ContainsKey(IdValuePair[0]) && map[IdValuePair[0]] == IdValuePair[1]) {
-                    allData.Add(new ModelCFG
-                    {
-                        ID = IdValuePair[0],
-                        SourceValue = IdValuePair[1],
-                        TargetValue = IdValuePair[1],
-                        Type = "unchanged"
-                    });
-                    un++;
-                }
-                else if (map.ContainsKey(IdValuePair[0]) && map[IdValuePair[0]] != IdValuePair[1])
-                {
-                    allData.Add(new ModelCFG
-                    {
-                        ID = IdValuePair[0],
-                        SourceValue = map[IdValuePair[0]],
-                        TargetValue = IdValuePair[1],
-                        Type = "modified"
-
-                    });
-                    mo++;
-                }
-                else if (!map.ContainsKey(IdValuePair[0]))
-                {
-                    allData.Add(new ModelCFG
-                    {
-                        ID = IdValuePair[0],
-                        TargetValue = IdValuePair[1],
-                        Type = "added"
-                    });
-                    ad++;
-                }                
-            }            
-            */
+            
 
             foreach (var item in map)
             {
                 if (!map2.ContainsKey(item.Key))
                 {
-                    Console.WriteLine($"Nera situ antrame, bet yra pirmame{item.Key} {item.Value}");
-                    re++;
+                    //Console.WriteLine($"Nera situ antrame, bet yra pirmame{item.Key} {item.Value}");
+                    
                 }
             }
             Console.WriteLine(  $" Count yra {map2.Count}");
@@ -135,37 +161,25 @@ namespace CGF_Comparer
 
             foreach(var key in keysNotInTarget)
             {
-                Console.WriteLine($"Nera antram {key.Key} {key.Value}");
+                //Console.WriteLine($"Nera antram {key.Key} {key.Value}");
                 
             }
             //if(map.ContainsKey())
-            var o = allData.Where(x => x.ID.StartsWith("40")).Select(x=>x);  //Filter by ID
+            var o = allData.Where(x => x.ID.StartsWith("4045951")).Select(x=>x);  //Filter by ID
             var e = allData.Where(x => x.Type == "added").ToArray();
-            var y = allData.Where(x => x.Type == "added").ToArray();
-
+            var y = all.Where(x => x.Type == "removed").Count();
+            Console.WriteLine(y);
             foreach (var key in o)
             {
                 //Console.WriteLine($"Atfiltruoti {key.ID}");
             }
-            foreach (var item in y)
+            foreach (var item in o)
             {
-                //Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+                Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
             }
-            /*
-            foreach (var item in map)
-            {
-                Console.WriteLine($"{item.Key} {item.Value}" );
-            }*/
 
-            Console.WriteLine(first[26]);
-            var c = first[26].Split(":");
-            if (c[1] == "")
-            {
-                Console.WriteLine( "yes");
-            }
-            //Console.WriteLine(a);
-
-            Console.WriteLine($"added {ad} unchanged {un} modified {mo} removed {re}");
+            Console.WriteLine();        
+            
         }
     }
 }
