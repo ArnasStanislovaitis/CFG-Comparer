@@ -3,77 +3,24 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Diagnostics;
 
 namespace CGF_Comparer
 {
     internal class Program
     {
-        public class ConfigurationData
-        {
-            public ConfigurationData() { }
-            public string ID { get; set; }
-            public string SourceValue { get; set; } = string.Empty;
-            public string TargetValue { get; set; } = string.Empty;
-            public string Type { get; set; }
-        }
+       
         static void Main(string[] args)
         {            
             using var stream = new MemoryStream();
-            string path = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB001-default";
-            string pathSecond = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB920-default";
+            
             // File names
-            //string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
-            string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
+            string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            //string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
             var names = Directory.GetFiles(dataDirectory);
 
-            int choice = 0;
-            for (int i = 0; i < names.Length; i++) {
-                //Console.WriteLine(Path.GetFileName(names[i]));                
-            }
-            // Menu
-            /*
-            Console.WriteLine("Choose a source file:");
-            //var input = Console.ReadLine();
-            PrintFileNames(names,choice);
-            while (!int.TryParse(Console.ReadLine(), out choice) || choice > names.Length || choice < 1 )
-            {
-                Console.WriteLine($"Invalid input. Please enter an integer value between {1} and {names.Length} : ");
-                PrintFileNames(names,choice);
-            }
-
-            Console.WriteLine( choice);
-
-            void PrintFileNames(string[] names,int choice)
-            { 
-                for (int i = 0; i < names.Length; i++)
-                {
-                    if(choice - 1 == i) { continue; }
-                    Console.WriteLine($"{i + 1}. {Path.GetFileName(names[i])}");
-                }
-            }
             
-            string sourcePath = string.Empty;
-            string targetPath = string.Empty;
-
-            sourcePath = names[choice - 1];
-            int previousChoice = 0;
-            previousChoice = choice;
-            choice = 0;
-
-            Console.WriteLine( sourcePath);
-            Console.WriteLine("Choose a target file");
-            PrintFileNames(names, previousChoice);
-            while (!int.TryParse(Console.ReadLine(), out choice) || choice > names.Length || choice < 1 || choice == previousChoice)
-            {     
-                  Console.WriteLine($"Invalid input. Please enter an integer value between {1} and {names.Length} : ");
-                  PrintFileNames(names, previousChoice);
-            }
-            targetPath = names[choice - 1];
-            Console.WriteLine( targetPath);
-            */
-            FilePicker fp = new FilePicker();
-            var k = fp.ChosenPathGenerator(names,0);
+            FilePathUtility fp = new FilePathUtility();
+            var k = fp.ChosenPathGenerator(names);
             Console.WriteLine(k.Item1);
             Console.WriteLine(k.Item2);
 
@@ -92,7 +39,7 @@ namespace CGF_Comparer
             int added = 0;
             Dictionary<string,string> map = new Dictionary<string,string>();
             Dictionary<string, string> map2 = new Dictionary<string, string>();
-            List<ConfigurationData> allData = new List<ConfigurationData>();
+            List<ModelCFG> allData = new List<ModelCFG>();
             //StreamReader sr = new StreamReader(stream);
             TextReader textReader = File.OpenText(k.Item1);
             TextReader textReader2 = File.OpenText(k.Item2);
@@ -122,14 +69,26 @@ namespace CGF_Comparer
             int un = 0;
             int mo = 0;
             int re = 0;
+            ReadCFG readCFG = new ReadCFG();
+            var da = readCFG.ReadCFGFile(k.Item1);
+            var dod = readCFG.ReadCFGFile(k.Item2);
+            
+            var sourced = readCFG.GetSourceFileValues(da);
+            DataComparison dc = new();
 
+            var all = dc.GetComparedData(dod, sourced);
+            foreach (var item in all)
+            {
+                Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+            }
+            /*
             for (int i = 6; i < second.Length - 1; i++)
             {
 
                 var IdValuePair = second[i].Split(":");
                 map2.Add(IdValuePair[0], IdValuePair[1]);
                 if (map.ContainsKey(IdValuePair[0]) && map[IdValuePair[0]] == IdValuePair[1]) {
-                    allData.Add(new ConfigurationData
+                    allData.Add(new ModelCFG
                     {
                         ID = IdValuePair[0],
                         SourceValue = IdValuePair[1],
@@ -140,7 +99,7 @@ namespace CGF_Comparer
                 }
                 else if (map.ContainsKey(IdValuePair[0]) && map[IdValuePair[0]] != IdValuePair[1])
                 {
-                    allData.Add(new ConfigurationData
+                    allData.Add(new ModelCFG
                     {
                         ID = IdValuePair[0],
                         SourceValue = map[IdValuePair[0]],
@@ -152,7 +111,7 @@ namespace CGF_Comparer
                 }
                 else if (!map.ContainsKey(IdValuePair[0]))
                 {
-                    allData.Add(new ConfigurationData
+                    allData.Add(new ModelCFG
                     {
                         ID = IdValuePair[0],
                         TargetValue = IdValuePair[1],
@@ -160,22 +119,9 @@ namespace CGF_Comparer
                     });
                     ad++;
                 }                
-            }
-            
-            /*
-             foreach(var data in allData)
-             {
-                 if (!map.ContainsKey(data.ID))
-                 {
-                     allData.Add(new ConfigurationData
-                     {
-                         ID = data.ID,
-                         SourceValue = data.SourceValue,
-                         Type = "removed"
-                     });
-                 }
-             }*/
-            //dfd
+            }            
+            */
+
             foreach (var item in map)
             {
                 if (!map2.ContainsKey(item.Key))

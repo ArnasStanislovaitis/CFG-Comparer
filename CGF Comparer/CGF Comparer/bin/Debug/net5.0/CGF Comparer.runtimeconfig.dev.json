@@ -1,9 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\Arnas\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\Arnas\\.nuget\\packages",
-      "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      "C:\\Users\\iot3\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\iot3\\.nuget\\packages"
     ]
   }
 }
