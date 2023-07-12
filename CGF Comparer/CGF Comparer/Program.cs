@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Diagnostics;
 
 namespace CGF_Comparer
 {
@@ -21,8 +22,9 @@ namespace CGF_Comparer
             using var stream = new MemoryStream();
             string path = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB001-default";
             string pathSecond = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data\FMB920-default";
-             // File names
-            string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            // File names
+            //string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
             var names = Directory.GetFiles(dataDirectory);
 
             int choice = 0;
@@ -30,6 +32,7 @@ namespace CGF_Comparer
                 //Console.WriteLine(Path.GetFileName(names[i]));                
             }
             // Menu
+            /*
             Console.WriteLine("Choose a source file:");
             //var input = Console.ReadLine();
             PrintFileNames(names,choice);
@@ -64,11 +67,15 @@ namespace CGF_Comparer
             while (!int.TryParse(Console.ReadLine(), out choice) || choice > names.Length || choice < 1 || choice == previousChoice)
             {     
                   Console.WriteLine($"Invalid input. Please enter an integer value between {1} and {names.Length} : ");
-                  PrintFileNames(names, choice);
+                  PrintFileNames(names, previousChoice);
             }
             targetPath = names[choice - 1];
             Console.WriteLine( targetPath);
-
+            */
+            FilePicker fp = new FilePicker();
+            var k = fp.ChosenPathGenerator(names,0);
+            Console.WriteLine(k.Item1);
+            Console.WriteLine(k.Item2);
 
             stream.Position = 0;
             int bufferSize = 512;
@@ -87,8 +94,8 @@ namespace CGF_Comparer
             Dictionary<string, string> map2 = new Dictionary<string, string>();
             List<ConfigurationData> allData = new List<ConfigurationData>();
             //StreamReader sr = new StreamReader(stream);
-            TextReader textReader = File.OpenText(sourcePath);
-            TextReader textReader2 = File.OpenText(targetPath);
+            TextReader textReader = File.OpenText(k.Item1);
+            TextReader textReader2 = File.OpenText(k.Item2);
             //sr.Close();
             //var a = sr.Read();
             var allText = textReader.ReadToEnd();
