@@ -12,7 +12,7 @@ namespace CGF_Comparer
             {
                 using (TextReader textReader = File.OpenText(path))
                 {
-                    var allIdValuePairs = textReader.ReadToEnd().Split(";");
+                    var allIdValuePairs = textReader.ReadToEnd().Split(";");                    
 
                     return allIdValuePairs;
                 }

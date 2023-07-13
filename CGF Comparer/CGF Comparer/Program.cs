@@ -78,8 +78,12 @@ namespace CGF_Comparer
                 {
                     foreach (var item in choices)
                     {
-                        FilterCall(all, item);
+                        DisplayFiltered(all, item);
                     }
+                }
+                else if (choices.Contains(input))
+                {
+                    choices.Remove(input);
                 }
                 else if (!choices.Contains(input))
                 {
@@ -91,7 +95,7 @@ namespace CGF_Comparer
                 }
                 
             }
-            void FilterCall(List<ModelCFG> data, string choice)
+            void DisplayFiltered(List<ModelCFG> data, string choice)
             {
                 if(choice == "1") {
                     var filtered = UnchangedFilter(data);
