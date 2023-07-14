@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CGF_Comparer
 {
     public class DataComparison
     {
-        List<ModelCFG> allData = new List<ModelCFG>();
+        readonly List<ModelCFG> allData = new List<ModelCFG>();
         readonly Dictionary<string, string> targetKeyValuePairs = new Dictionary<string, string>();
         public List<ModelCFG> GetComparedData(string[] IdValuePair, Dictionary<string, string> sourceKeyValues)
         {
@@ -15,7 +16,7 @@ namespace CGF_Comparer
             return allData;
         }
         //IdValuePairs - 40100: 1
-        public void CompareFiles(string[] IdValuePairs, Dictionary<string,string> sourceKeyValues) {            
+        private void CompareFiles(string[] IdValuePairs, Dictionary<string,string> sourceKeyValues) {            
 
             for (int i = 6; i < IdValuePairs.Length - 1; i++)
             {   
@@ -54,19 +55,19 @@ namespace CGF_Comparer
                 }
             }
         }
-        public void AddValuesNotInTarget(Dictionary<string, string> sourceKeyValues)
+        private void AddValuesNotInTarget(Dictionary<string, string> sourceKeyValues)
         {
-            var keysNotInTarget = sourceKeyValues.Except(targetKeyValuePairs);
+            var keysNotInTarget = sourceKeyValues.Where(sourceKeys => !targetKeyValuePairs.ContainsKey(sourceKeys.Key));
 
-            foreach (var keyValuePair in keysNotInTarget)
+            foreach (var keyValue in keysNotInTarget)
             {
                 allData.Add(new ModelCFG
                 {
-                    ID = keyValuePair.Key,
-                    TargetValue = keyValuePair.Value,
+                    ID = keyValue.Key,
+                    TargetValue = keyValue.Value,
                     Type = "removed"
                 });
-            }
+            }                     
         }
     }
 }
