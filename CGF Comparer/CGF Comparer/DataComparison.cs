@@ -14,6 +14,7 @@ namespace CGF_Comparer
 
             return allData;
         }
+        //IdValuePairs - 40100: 1
         public void CompareFiles(string[] IdValuePairs, Dictionary<string,string> sourceKeyValues) {            
 
             for (int i = 6; i < IdValuePairs.Length - 1; i++)

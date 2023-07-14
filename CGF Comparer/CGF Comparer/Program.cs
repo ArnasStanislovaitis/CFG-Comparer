@@ -14,30 +14,24 @@ namespace CGF_Comparer
             using var stream = new MemoryStream();
             
             // File names
-            //string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
-            string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
+            string dataDirectory = @"C:\Users\iot3\source\repos\CGF Comparer\CGF Comparer\Data";
+            //string dataDirectory = @"C:\Users\Arnas\Documents\GitHub\CFG-Comparer\CGF Comparer\CGF Comparer\Data";
             var names = Directory.GetFiles(dataDirectory);
 
             
             FilePathUtility fp = new FilePathUtility();
-            var k = fp.ChosenPathGenerator(names);
-            Console.WriteLine(k.Item1);
-            Console.WriteLine(k.Item2);
+            var paths = fp.ChosenPathGenerator(names);
+            Console.WriteLine(paths.Item1);
+            Console.WriteLine(paths.Item2);
 
-            stream.Position = 0;
-            int bufferSize = 512;
-            byte[] decompressedBytes = new byte[bufferSize];
-            // using var decompressor = new GZipStream(File.Open(path,FileMode.Open), CompressionMode.Decompress);
-            //int length = decompressor.Read(decompressedBytes, 0, bufferSize);
-
-            //decompressor.Close();            
-            
+                     
+            /*
             Dictionary<string,string> map = new Dictionary<string,string>();
             Dictionary<string, string> map2 = new Dictionary<string, string>();
             List<ModelCFG> allData = new List<ModelCFG>();
             //StreamReader sr = new StreamReader(stream);
-            TextReader textReader = File.OpenText(k.Item1);
-            TextReader textReader2 = File.OpenText(k.Item2);
+            TextReader textReader = File.OpenText(paths.Item1);
+            TextReader textReader2 = File.OpenText(paths.Item2);
             //sr.Close();
             //var a = sr.Read();
             var allText = textReader.ReadToEnd();
@@ -45,13 +39,13 @@ namespace CGF_Comparer
 
             string[] first = allText.Split(";");
             string[] second = allText2.Split(";");
-                       
+            */
             
            
                         
             ReadCFG readCFG = new ReadCFG();
-            var src = readCFG.ReadCFGFile(k.Item1);
-            var tar = readCFG.ReadCFGFile(k.Item2);
+            var src = readCFG.ReadCFGFile(paths.Item1);
+            var tar = readCFG.ReadCFGFile(paths.Item2);
             
             var sourced = readCFG.GetSourceFileValues(src);
             DataComparison dc = new();
@@ -145,45 +139,22 @@ namespace CGF_Comparer
                         
 
 
-            foreach (var item in all)
-            {
-                //Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
-                
-            }
+            ou.PrintAllData(all);
+                   
+
+          
             
+            IEnumerable<ModelCFG> FilterByID(List<ModelCFG> data,string id)
+            {
+                 var filteredById = data.Where(x => x.ID.StartsWith(id)).Select(x=>x);
 
-            foreach (var item in map)
-            {
-                if (!map2.ContainsKey(item.Key))
-                {
-                    //Console.WriteLine($"Nera situ antrame, bet yra pirmame{item.Key} {item.Value}");
-                    
-                }
-            }
-            Console.WriteLine(  $" Count yra {map2.Count}");
-            var keysNotInTarget = map.Except(map2);//.Concat(map2.Except(map));
-
-            foreach(var key in keysNotInTarget)
-            {
-                //Console.WriteLine($"Nera antram {key.Key} {key.Value}");
-                
-            }
-            //if(map.ContainsKey())
-            var o = allData.Where(x => x.ID.StartsWith("4045951")).Select(x=>x);  //Filter by ID
-            var e = allData.Where(x => x.Type == "added").ToArray();
-            var y = all.Where(x => x.Type == "removed").Count();
-            Console.WriteLine(y);
-            foreach (var key in o)
-            {
-                //Console.WriteLine($"Atfiltruoti {key.ID}");
-            }
-            foreach (var item in o)
-            {
-                Console.WriteLine($"{item.ID} {item.SourceValue} {item.TargetValue} {item.Type}");
+                return filteredById;
             }
 
-            Console.WriteLine();        
-            
+
+            Counter counter = new Counter();
+            counter.DisplayResultsCount(all);
+            //2323 15 1 53
         }
     }
 }
