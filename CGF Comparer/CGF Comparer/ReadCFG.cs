@@ -24,7 +24,7 @@ namespace CGF_Comparer
                 return default;
             }
         }
-        string[] GetFileInformation(string[] cfgData)
+        public string[] GetFileInformation(string[] cfgData)
         {
             string[] fileInformation = new string[6];
 

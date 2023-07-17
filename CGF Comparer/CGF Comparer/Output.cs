@@ -30,6 +30,15 @@ namespace CGF_Comparer
             }
             Console.ForegroundColor = ConsoleColor.Gray;
         }
+        public void PrintFilesHeadings(List<string> data)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Console.WriteLine($"{data[i],-57} {data[i + 6]}");
+            }
+            Console.WriteLine();
+
+        }
         public void DisplayFilterChoices(HashSet<int> set)
         {
             OutputHelper output = new OutputHelper();
@@ -49,13 +58,23 @@ namespace CGF_Comparer
                 }
             }
         }
-        public void DisplayFilteredResults(List<ModelCFG> data, int choice)
+        public void DisplayFilteredResults(List<ModelCFG> data, int choice,List<string> dataHeadings)
         {
             Output output = new Output();
             ResultsFilter filter = new ResultsFilter();
             string[] filters = new string[4] { "unchanged", "removed", "added", "modified" };
             var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]);
+            output.PrintFilesHeadings(dataHeadings);
             output.PrintAllCfgData(filtered);
-        }        
+        } 
+        public void DisplayMenu()
+        {
+            Console.Clear();
+            string[] menuChoices = new string[3] { "1. Enter result filter menu ", "2. Display all data", "3. Filter by Id" };
+            foreach (var item in menuChoices)
+            {
+                Console.WriteLine(item);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace CGF_Comparer
 {
     public class FilterMenu
     {
-        public void DisplayFilterMenu(List<ModelCFG> cfgData)
+        public void DisplayFilterMenu(List<ModelCFG> cfgData,List<string> dataHeadings)
         {
             Output output = new();
             InputValidator validator = new();            
@@ -22,7 +22,7 @@ namespace CGF_Comparer
                 {
                     foreach (var item in choices)
                     {
-                       output.DisplayFilteredResults(cfgData, item);
+                       output.DisplayFilteredResults(cfgData, item, dataHeadings);
                     }
                 }
 
