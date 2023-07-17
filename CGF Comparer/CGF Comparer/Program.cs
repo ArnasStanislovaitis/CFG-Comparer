@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace CGF_Comparer
 {
     internal class Program
@@ -9,8 +10,7 @@ namespace CGF_Comparer
             while (true)
             {
                 mainMenu.Menu();
-            }
-            
+            }            
         }
-    }
+    }    
 }
