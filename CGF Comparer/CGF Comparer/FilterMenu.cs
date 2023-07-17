@@ -20,9 +20,11 @@ namespace CGF_Comparer
 
                 if (choice == 5)
                 {
+                    output.PrintFilesHeadings(dataHeadings);
+
                     foreach (var item in choices)
                     {
-                       output.DisplayFilteredResults(cfgData, item, dataHeadings);
+                       output.DisplayFilteredResults(cfgData, item);
                     }
                 }
 

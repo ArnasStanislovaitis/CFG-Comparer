@@ -6,7 +6,11 @@ namespace CGF_Comparer
         static void Main(string[] args)
         {     
             MainMenu mainMenu = new MainMenu();
-            mainMenu.Menu();
+            while (true)
+            {
+                mainMenu.Menu();
+            }
+            
         }
     }
 }

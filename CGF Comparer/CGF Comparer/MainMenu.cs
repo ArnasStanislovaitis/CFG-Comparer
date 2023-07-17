@@ -46,6 +46,7 @@ namespace CGF_Comparer
             {
                 Console.Clear();  
                 filterMenu.DisplayFilterMenu(allCfgData,dataHeadings);
+                Console.ReadKey();
             }
             if(choice == 2)
             {
@@ -53,6 +54,7 @@ namespace CGF_Comparer
                 output.PrintFilesHeadings(dataHeadings);                
                 output.PrintAllCfgData(allCfgData);
                 counter.DisplayResultsCount(allCfgData);
+                Console.ReadKey();
             }     
             if (choice == 3) 
             {
@@ -62,6 +64,7 @@ namespace CGF_Comparer
                 var results = resultsFilter.FilterByID(allCfgData,filter);
                 output.PrintFilesHeadings(dataHeadings);
                 output.PrintAllCfgData(results);
+                Console.ReadKey();
             } 
         }
     }

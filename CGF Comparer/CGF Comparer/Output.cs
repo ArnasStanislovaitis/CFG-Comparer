@@ -58,13 +58,12 @@ namespace CGF_Comparer
                 }
             }
         }
-        public void DisplayFilteredResults(List<ModelCFG> data, int choice,List<string> dataHeadings)
+        public void DisplayFilteredResults(List<ModelCFG> data, int choice)
         {
             Output output = new Output();
             ResultsFilter filter = new ResultsFilter();
             string[] filters = new string[4] { "unchanged", "removed", "added", "modified" };
-            var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]);
-            output.PrintFilesHeadings(dataHeadings);
+            var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]);            
             output.PrintAllCfgData(filtered);
         } 
         public void DisplayMenu()
