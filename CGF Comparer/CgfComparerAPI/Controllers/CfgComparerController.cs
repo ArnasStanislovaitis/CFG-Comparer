@@ -2,6 +2,7 @@
 using CgfComparerAPI.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace CgfComparerAPI.Controllers
 {
@@ -21,7 +22,19 @@ namespace CgfComparerAPI.Controllers
             var a = service.GetComparedData();
             return Ok(a);
         }
+        [HttpPost]
+        [Route("")]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
 
-        
+            var a = await service.ReadFile(file); 
+            
+            if(a == null)
+            {
+                return BadRequest();
+            }     
+
+            return Ok(a); 
+        }
     }
 }
