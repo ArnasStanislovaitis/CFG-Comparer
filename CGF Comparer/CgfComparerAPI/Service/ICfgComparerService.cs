@@ -3,6 +3,8 @@
     public interface ICfgComparerService
     {
         string GetComparedData();
-        public Task<string?> ReadFile(IFormFile file);
+        public string[]? ReadFile(IFormFile file);
+        public Dictionary<string, string> GetSourceData(IFormFile file);
+        public void GetTargetData(IFormFile file);
     }
 }

@@ -19,22 +19,39 @@ namespace CgfComparerAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllResults()
         {
-            var a = service.GetComparedData();
+            var a = service.GetComparedData();            
+
             return Ok(a);
         }
         [HttpPost]
-        [Route("")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        [Route("UploadSource")]
+        public async Task<IActionResult> UploadSource(IFormFile file)
         {
 
-            var a = await service.ReadFile(file); 
-            
-            if(a == null)
+            var a = service.ReadFile(file);
+            var b = service.GetSourceData(file);
+
+            if (b == null || b.Count()<1)
             {
                 return BadRequest();
             }     
 
-            return Ok(a); 
+            return Ok(b); 
+        }
+        [HttpPost]
+        [Route("UploadTarget")]
+        public async Task<IActionResult> UploadTarget(IFormFile file)
+        {
+
+            var a = service.ReadFile(file);
+            service.GetTargetData(file);
+
+            if (a == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(a);
         }
     }
 }
