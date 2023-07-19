@@ -14,6 +14,7 @@ namespace CGF_Comparer
         public IEnumerable<ModelCFG> ComparisonResultFilter(List<ModelCFG> data, string filter)
         {
             var unchangedCount = data.Where(x => x.Type == filter);
+
             return unchangedCount;
         }
     }

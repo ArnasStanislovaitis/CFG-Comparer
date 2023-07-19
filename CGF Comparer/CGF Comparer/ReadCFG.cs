@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 
 namespace CGF_Comparer
 {
@@ -10,13 +11,21 @@ namespace CGF_Comparer
         {
             try
             {
-                using (TextReader textReader = File.OpenText(path))
+                using (var fileStream = new FileStream(path, FileMode.Open))
                 {
-                    var allIdValuePairs = textReader.ReadToEnd().Split(";");                    
+                    {
+                        using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
+                        {
+                            using (var streamReader = new StreamReader(gzipStream))
+                            {
+                                var allIdValuePairs = streamReader.ReadToEnd().Split(";");
 
-                    return allIdValuePairs;
+                                return allIdValuePairs;
+                            }
+                        }
+                    }          
                 }
-            }
+            }           
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while reading the CFG file: {ex.Message}");
