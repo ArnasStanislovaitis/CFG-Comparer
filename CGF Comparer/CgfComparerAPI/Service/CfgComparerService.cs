@@ -1,13 +1,13 @@
 ﻿using CGF_Comparer;
 using CgfComparerAPI.Models;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text.Json;
 namespace CgfComparerAPI.Service
 {
     public class CfgComparerService : ICfgComparerService
     {
-        private static CfgModel allData = new();
-        private static Dictionary<string, string> sourceCfgDataDictionary = new();
-        private static IEnumerable<ModelCFG> filteredData;
+        private static CfgModel allData = new ();
+        private static Dictionary<string, string> sourceCfgDataDictionary = new();        
         
         public string GetComparedData()
         {
@@ -57,6 +57,11 @@ namespace CgfComparerAPI.Service
             DataComparison comp = new DataComparison();
             ReadCFG readCFG = new ReadCFG();
             var path = ReadFile2(file);
+
+            if (string.IsNullOrEmpty(path))
+            {
+                return;
+            }
             var stringData = readCFG.ReadCFGFile(path);
             allData.TargetInformation = readCFG.GetFileInformation(stringData);
             allData.TargetInformation[5] = file.FileName;
@@ -66,6 +71,11 @@ namespace CgfComparerAPI.Service
         {
             ReadCFG readCFG = new ReadCFG();
             var path = ReadFile2(file);
+
+            if(string.IsNullOrEmpty(path))
+            {
+                return default;
+            }
             var stringData = readCFG.ReadCFGFile(path);
             allData.SourceInformation = readCFG.GetFileInformation(stringData);
             allData.SourceInformation[5] = file.FileName;
@@ -77,7 +87,7 @@ namespace CgfComparerAPI.Service
         {
             if (file == null || file.Length == 0)
             {
-                return default;
+                return string.Empty;
             }
             var tempPath = Path.GetTempFileName();
 
@@ -89,7 +99,7 @@ namespace CgfComparerAPI.Service
             return tempPath;
         }
 
-        public IEnumerable<ModelCFG> FilterById(string id)
+        public string FilterById(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -98,15 +108,35 @@ namespace CgfComparerAPI.Service
             ResultsFilter resultsFilter = new ();
             var results = resultsFilter.FilterByID(allData.ComparisonResults, id);
 
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(results, options);
+
+            return jsonString;
+        }
+        public IEnumerable<ModelCFG>? FilterByResult(string filter)
+        {     
+            ResultsFilter resultsFilter = new ();
+            var results = resultsFilter.ComparisonResultFilter(allData.ComparisonResults,filter);            
+
+            if (results == null || !results.Any())
+            {
+                return default;
+            }                      
+
             return results;
         }
-        public IEnumerable<ModelCFG> FilterByResult(string filter)
-        {            
-            ResultsFilter resultsFilter = new ();
-            var results = resultsFilter.ComparisonResultFilter(allData.ComparisonResults, filter);
-            filteredData = results;            
+        public IEnumerable<ModelCFG> FilterByResultAndId(string id, string[] filters)
+        {
+            ResultsFilter resultsFilter = new();
+            var results = allData.ComparisonResults?.Where(x => filters.Contains(x.Type)).ToList();
+            var filteredResults = resultsFilter.FilterByID(results, id);
 
-            return filteredData;
+            if (filteredResults == null || !filteredResults.Any())
+            {
+                return default;
+            }
+
+            return filteredResults;
         }
     }
 }
