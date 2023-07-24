@@ -52,7 +52,7 @@ namespace CgfComparerAPI.Service
         */
         //            VERSION2
 
-        public void GetTargetData(IFormFile file)
+        public string[] GetTargetData(IFormFile file)
         {
             DataComparison comp = new DataComparison();
             ReadCFG readCFG = new ReadCFG();
@@ -60,14 +60,16 @@ namespace CgfComparerAPI.Service
 
             if (string.IsNullOrEmpty(path))
             {
-                return;
+                return default;
             }
             var stringData = readCFG.ReadCFGFile(path);
             allData.TargetInformation = readCFG.GetFileInformation(stringData);
             allData.TargetInformation[5] = file.FileName;
             allData.ComparisonResults = comp.GetComparedData(stringData, sourceCfgDataDictionary);
+
+            return allData.TargetInformation;
         }
-        public Dictionary<string, string> GetSourceData(IFormFile file)
+        public string[] GetSourceData(IFormFile file)
         {
             ReadCFG readCFG = new ReadCFG();
             var path = ReadFile2(file);
@@ -81,7 +83,7 @@ namespace CgfComparerAPI.Service
             allData.SourceInformation[5] = file.FileName;
             sourceCfgDataDictionary = readCFG.GetSourceFileValues(stringData);
 
-            return sourceCfgDataDictionary;
+            return allData.SourceInformation;
         }
         public string ReadFile2(IFormFile file)
         {
@@ -129,8 +131,13 @@ namespace CgfComparerAPI.Service
         {
             ResultsFilter resultsFilter = new();
             var results = allData.ComparisonResults?.Where(x => filters.Contains(x.Type)).ToList();
-            var filteredResults = resultsFilter.FilterByID(results, id);
 
+            if(string.IsNullOrEmpty(id) && results.Any())
+            {
+                return results;
+            }
+            var filteredResults = resultsFilter.FilterByID(results, id);
+            
             if (filteredResults == null || !filteredResults.Any())
             {
                 return default;
