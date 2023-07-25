@@ -1,6 +1,7 @@
 ﻿using CGF_Comparer;
 using CgfComparerAPI.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 namespace CgfComparerAPI.Service
 {
@@ -83,7 +84,7 @@ namespace CgfComparerAPI.Service
             allData.SourceInformation[5] = file.FileName;
             sourceCfgDataDictionary = readCFG.GetSourceFileValues(stringData);
 
-            return allData.SourceInformation;
+            return allData.SourceInformation;           
         }
         public string ReadFile2(IFormFile file)
         {

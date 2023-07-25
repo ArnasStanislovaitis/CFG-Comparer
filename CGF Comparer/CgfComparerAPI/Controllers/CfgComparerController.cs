@@ -65,7 +65,7 @@ namespace CgfComparerAPI.Controllers
                 return BadRequest("Please select a cfg file");
             }
             
-            var fileInformation = service.GetTargetData(file);            
+            var fileInformation = service.GetTargetData(file);             
 
             return Ok(fileInformation);
         }
@@ -120,7 +120,7 @@ namespace CgfComparerAPI.Controllers
         public async Task<IActionResult> FilterByIdAndResults(string? id, [FromQuery] string[] filters)
         {
             //if (string.IsNullOrEmpty(id))            {                return BadRequest();            }
-            var filteredData = service.FilterByResultAndId(id, filters);            
+            var filteredData = service.FilterByResultAndId(id!, filters);            
 
             if (filteredData == null || !filteredData.Any())
             {
