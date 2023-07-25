@@ -1,0 +1,364 @@
+﻿@page "/"
+@using System.Text.Json;
+@inject HttpClient Http
+
+
+
+<div class="fileinfo">
+    <div class="sourceinfo">
+        <span class="title">Source</span>
+        <div class="fileSearch">  
+            <p class="file-name">@sourceFileName</p>
+            <label for="sourceUpload" class="input-label">Browse</label>
+            <InputFile class="sr-only" type="file" id="sourceUpload" OnChange="@UploadSource" />
+        </div>
+@if (sourceInfo.Length < 1)
+{
+    <p></p>
+}
+else
+{
+    @foreach(var line in sourceInfo)
+    {
+    <p>@line</p>    
+    }
+}
+</div>
+
+<div class="targetinfo">
+        <span class="title">Target</span>
+     <div class="fileSearch">
+            <p class="file-name">@targetFileName</p>
+            <label for="targetUpload" class="input-label">Browse</label>
+            <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" />
+     </div>
+@if (targetInfo.Length < 1)
+{
+    <p></p>
+}
+else
+{
+    @foreach (var line in targetInfo)
+    {
+        <p>@line</p>
+    }
+}
+    </div>
+</div>
+
+
+
+
+
+<div class="dataAndFilters">
+<div class="filterChoices">    
+    <span class="title">Results</span> 
+    <input type="text"  @oninput="HandleInput" @bind="searchText" placeholder="Search by ID"/>
+    <div class="checkboxes">
+        <div>
+            <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" />
+            <label for="removed">Removed</label>
+        </div>
+        <div>
+            <input type="checkbox" @bind="unchangedChecked" id="unchanged" @oninput="HandleInput3" />
+            <label for="unchanged">Unchanged</label>
+        </div>
+        <div>
+        <input type="checkbox" @bind="modifiedChecked" id="modified" @oninput="HandleInput4" />
+        <label for="modified">Modified</label>
+        </div>
+        <div>
+            <input type="checkbox" @bind="addedChecked" id="added" @oninput="HandleInput5" />
+            <label for="added">Added</label>
+        </div>
+    </div>
+    
+</div>
+
+@if (allData == null || !allData.Any())
+{
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Source</th>
+                <th>Target</th>
+                <th>Result</th>
+            </tr>            
+        </thead>
+        <tbody>
+            <tr><td>No data</td></tr>
+        </tbody>
+        </table>
+}
+else
+{
+    <div class="table-container">    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Source</th>
+                <th>Target</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            @foreach (var item in allData)
+            {
+                <tr style="background-color: @(GetColor(item.Type))">
+                    <td>@item.ID</td>
+                    <td>@item.SourceValue</td>
+                    <td>@item.TargetValue</td>
+                    <td>@item.Type</td>
+                </tr>
+            }
+        </tbody>
+        
+    </table>
+    </div>
+    
+}
+</div>
+
+
+@code {
+    private ModelCFG[] allData;
+
+
+    string myValue;
+    string[] filters;
+    string[] sourceInfo = new string[0];
+    string[] targetInfo = new string[0];
+    private string searchText ;
+    private bool removedChecked  ;
+    private bool unchangedChecked ;
+    private bool modifiedChecked ;
+    private bool addedChecked ;
+    private string sourceFileName = "Select file";
+    private string targetFileName = "Select file";
+    //List<string> selectedFilters = new List<string>();
+
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+        await UpdateSearch();
+    }
+    private async Task HandleInput2(ChangeEventArgs e)
+    {
+        //searchText = e.Value.ToString();
+        removedChecked = (bool)e.Value;
+        HandleCheckboxChange("removed", removedChecked);
+
+        await UpdateSearch();
+    }
+    private async Task HandleInput3(ChangeEventArgs e)
+    {
+        //searchText = e.Value.ToString();
+        unchangedChecked = (bool)e.Value;
+        HandleCheckboxChange("unchanged", unchangedChecked);
+
+        await UpdateSearch();
+    }
+    private async Task HandleInput4(ChangeEventArgs e)
+    {
+        //searchText = e.Value.ToString();
+        modifiedChecked = (bool)e.Value;
+        HandleCheckboxChange("modified", modifiedChecked);
+
+        await UpdateSearch();
+    }
+    private async Task HandleInput5(ChangeEventArgs e)
+    {
+        //searchText = e.Value.ToString();
+        addedChecked = (bool)e.Value;
+        HandleCheckboxChange("added", addedChecked);
+
+        await UpdateSearch();
+    }
+    private async Task UpdateSearch()
+    {
+        //var a = GetSelectedFilters();
+        await GetAll(searchText,selectedFilters);
+    }
+
+    // Helper method to get the selected filters
+    private List<string> GetSelectedFilters()
+    {
+        //var selectedFilters = new List<string>();
+
+        if (removedChecked)
+        {
+            selectedFilters.Add("removed");
+        }
+        if (unchangedChecked)
+        {
+            selectedFilters.Add("unchanged");
+        }
+        if (modifiedChecked)
+        {
+            selectedFilters.Add("modified");
+        }
+        if (addedChecked)
+        {
+            selectedFilters.Add("added");
+        }
+
+        return selectedFilters;
+    }
+
+    
+    private List<string> selectedFilters = new List<string>();
+
+    
+    private void HandleCheckboxChange(string filter, bool isChecked)
+    {
+        if (isChecked)
+        {
+            selectedFilters.Add(filter);
+        }
+        else
+        {
+            selectedFilters.Remove(filter);
+        }
+    }
+
+    public async void HandleSubmit(string id)
+    {        
+        allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterById/{id}");
+
+    }
+
+
+    public async void UploadSource(InputFileChangeEventArgs e)
+    {
+
+        var file = e.File;
+        var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadSource", new MultipartFormDataContent
+    {
+        { new StreamContent(file.OpenReadStream()), "file", file.Name }
+    });
+        if (response.IsSuccessStatusCode)
+        {
+            sourceInfo = await response.Content.ReadFromJsonAsync<string[]>();
+        }
+        sourceFileName = file.Name;
+        StateHasChanged();
+        //Console.WriteLine(file.ContentType);
+        //var a = JsonSerializer.Serialize(file);
+        //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadSource", a);
+        //Console.Write(p.StatusCode);
+    }
+    public async void UploadTarget(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadTarget", new MultipartFormDataContent
+    {
+        { new StreamContent(file.OpenReadStream()), "file", file.Name }
+    });
+
+        if (response.IsSuccessStatusCode)
+        {
+            targetInfo = await response.Content.ReadFromJsonAsync<string[]>();
+        }
+        targetFileName = file.Name;
+        StateHasChanged();
+        
+        //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadTarget", file);
+    }
+    
+    /*
+    public async void GetAll(string id = "")
+    {
+        allData = await Http.GetFromJsonAsync<ModelCFG[]>($" https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=unchanged&filters=modified&filters=added&filters=removed");
+    }*/
+    public async Task<IEnumerable<ModelCFG>> GetAll(string id = "", IEnumerable<string> filters = null)
+    {
+        string baseUrl = "https://localhost:7219/api/CfgComparer/FilterByIdResults";
+
+        // Construct the URL with the provided ID (if any) and filters (if any)
+        string url = baseUrl;
+        if (!string.IsNullOrEmpty(id))
+        {
+            url += $"?id={id}";
+        }
+
+        if (filters != null && filters.Any())
+        {
+            string filtersQuery = string.Join("&", filters.Select(filter => $"filters={filter}"));
+            if (url.Contains('?'))
+            {
+                url += $"&{filtersQuery}";
+            }
+            else
+            {
+                url += $"?{filtersQuery}";
+            }
+        }
+
+        // Fetch data from the URL
+        //var data = await Http.GetFromJsonAsync<ModelCFG[]>(url);
+        var a = await Http.GetAsync(url);
+        if (a.IsSuccessStatusCode)
+        {
+            allData = await a.Content.ReadFromJsonAsync<ModelCFG[]>();     
+            return allData;
+        }
+        else
+        {
+            allData =  new ModelCFG[0];
+            return allData;
+            throw new Exception($"Error getting data. Status code: {a.StatusCode}");
+        }
+        /*
+        var b = a.Result;
+        allData = a.
+        if (data == null || !data.Any())
+        {
+            allData = new ModelCFG[1];
+        }
+        allData = await Http.GetFromJsonAsync<ModelCFG[]>(url);
+        return allData;*/
+    }
+    private string GetColor(string type)
+    {
+        switch (type)
+        {
+            case "unchanged":
+                return "#DCDCDC";
+            case "added":
+                return "#98FB98";
+            case "modified":
+                return "#FFFFE0";
+            case "removed":
+                return "#FFCCCC";
+            default:
+                return "gray";
+        }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        //allData = await Http.GetFromJsonAsync<CfgModel>("https://localhost:7219/api/CfgComparer");
+        //allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterByIdResults?filters=unchanged&filters=modified&filters=added");
+    }
+    public class ModelCFG
+    {
+        public ModelCFG() { }
+        public string ID { get; set; }
+        public string SourceValue { get; set; } = string.Empty;
+        public string TargetValue { get; set; } = string.Empty;
+        public string Type { get; set; }
+    }
+
+    public class CfgModel
+    {
+        public string[]? SourceInformation { get; set; }
+        public string[]? TargetInformation { get; set; }
+        public List<ModelCFG>? ComparisonResults { get; set; } = new List<ModelCFG>();
+    }
+    
+}
