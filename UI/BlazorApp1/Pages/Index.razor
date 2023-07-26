@@ -50,10 +50,10 @@
 <div class="filterChoices">    
     <span class="title">Results</span> 
 
-    <input type="text"  @oninput="HandleInput" @bind="searchText" placeholder="Search by ID" disabled/>
+    <input type="text"  @oninput="HandleInput" @bind="searchText" placeholder="Search by ID" />
         <div class="checkboxes" disabled>
         <div>
-            <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" disabled />
+            <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" />
             <label for="removed">Removed</label>
         </div>
         <div>
@@ -208,10 +208,10 @@ else
         return selectedFilters;
     }
 
-    
+
     private List<string> selectedFilters = new List<string>();
 
-    
+
     private void HandleCheckboxChange(string filter, bool isChecked)
     {
         if (isChecked)
@@ -266,13 +266,13 @@ else
         }
         targetFileName = file.Name;
         StateHasChanged();
-        
+
         //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadTarget", file);
     }
-    
+
     /*
     public async void GetAll(string id = "")
-    {
+        {
         allData = await Http.GetFromJsonAsync<ModelCFG[]>($" https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=unchanged&filters=modified&filters=added&filters=removed");
     }*/
     public async Task<IEnumerable<ModelCFG>> GetAll(string id = "", IEnumerable<string> filters = null)
@@ -317,7 +317,7 @@ else
         var b = a.Result;
         allData = a.
         if (data == null || !data.Any())
-        {
+            {
             allData = new ModelCFG[1];
         }
         allData = await Http.GetFromJsonAsync<ModelCFG[]>(url);
@@ -339,7 +339,16 @@ else
                 return "gray";
         }
     }
-    
+    private string DisableButton(bool required)
+    {
+        if (required)
+        {
+            return "Disabled";
+        }
+
+        return string.Empty;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         //allData = await Http.GetFromJsonAsync<CfgModel>("https://localhost:7219/api/CfgComparer");
