@@ -120,7 +120,7 @@ a, .btn-link {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    margin: 40px;
+    margin: 35px;
 }
 .filterChoices {
     display: flex;
@@ -144,12 +144,14 @@ a, .btn-link {
 }
 
 .input-label {
-    padding: 10px;
+    padding: 13px;
     background-color: #1b6ec2;
     color: white;
     border-radius: 10px;
     cursor: pointer;
-    width:80px
+    width:80px;
+    margin-bottom:5px;
+    
 }
 .fileSearch {
     display: flex;
@@ -157,7 +159,7 @@ a, .btn-link {
     align-items: center;
     margin: 10px;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
+    padding-bottom: 6px;
     width: 580px;
     align-items:flex-end;
 }
@@ -179,7 +181,7 @@ a, .btn-link {
     line-height: 40px;
     color: black;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 16px;
     width: 100%;
     border-bottom: 1px solid rgba(0,0,0,0.3);
 }
@@ -219,4 +221,19 @@ input[type="text"] {
     top: 0;
     z-index: 2;
     background-color: #f9f9f9;
+}
+.sourceLine {
+    margin: 8px;
+    padding-left: 10px;
+    font-size: 17px;
+    line-height: 27px;
+}
+input[type=checkbox][disabled] {
+    filter: invert(25%);
+}
+.file-name {
+    font-size: 17px;
+    font-weight:200;
+    padding-top:15px;
+    padding-left:10px;    
 }

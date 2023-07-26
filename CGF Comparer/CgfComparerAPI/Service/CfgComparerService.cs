@@ -64,8 +64,7 @@ namespace CgfComparerAPI.Service
                 return default;
             }
             var stringData = readCFG.ReadCFGFile(path);
-            allData.TargetInformation = readCFG.GetFileInformation(stringData);
-            allData.TargetInformation[5] = file.FileName;
+            allData.TargetInformation = readCFG.GetFileInformation(stringData);            
             allData.ComparisonResults = comp.GetComparedData(stringData, sourceCfgDataDictionary);
 
             return allData.TargetInformation;
@@ -80,8 +79,7 @@ namespace CgfComparerAPI.Service
                 return default;
             }
             var stringData = readCFG.ReadCFGFile(path);
-            allData.SourceInformation = readCFG.GetFileInformation(stringData);
-            allData.SourceInformation[5] = file.FileName;
+            allData.SourceInformation = readCFG.GetFileInformation(stringData);            
             sourceCfgDataDictionary = readCFG.GetSourceFileValues(stringData);
 
             return allData.SourceInformation;           
