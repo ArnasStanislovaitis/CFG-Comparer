@@ -34,15 +34,7 @@
                 <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled/>
             </div>
 
-        }
-        else if (isTargetFileRequired)
-        {
-            <div class="fileSearch">
-                <p class="file-name">Select source file first</p>
-                <label for="targetUpload" class="input-label">Browse</label>
-                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled />
-            </div>
-        }
+        }        
         else
         {
              <div class="fileSearch">
@@ -52,7 +44,7 @@
              </div>
         }
        
-    @if (targetInfo.Length < 1 || isSourceFileRequired || isTargetFileRequired)
+    @if (isSourceFileRequired || isTargetFileRequired)
     {
         <p></p>
     }
@@ -293,7 +285,8 @@ else
             sourceInfo = await response.Content.ReadFromJsonAsync<string[]>();
             isSourceFileRequired = false;
             isTargetFileRequired = true;
-            sourceFileName = file.Name;            
+            sourceFileName = file.Name;  
+            targetFileName = "Select a file";
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
@@ -318,21 +311,22 @@ else
         { new StreamContent(file.OpenReadStream()), "file", file.Name }
     });
 
+        
         if (response.IsSuccessStatusCode)
-        {
+        {            
             targetInfo = await response.Content.ReadFromJsonAsync<string[]>();
             isTargetFileRequired = false;
-            targetFileName = file.Name;            
+            targetFileName = file.Name;  
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
             isTargetFileRequired = true;
-            targetFileName = "Invalid file";
+            targetFileName = "Invalid file";            
         }
         else
         {
             isTargetFileRequired = true;
-            targetFileName = "Select a file";
+            targetFileName = "Select a file";            
         }
         StateHasChanged();        
         
