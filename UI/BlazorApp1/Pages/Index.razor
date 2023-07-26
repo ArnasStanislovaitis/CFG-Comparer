@@ -11,7 +11,7 @@
             <label for="sourceUpload" class="input-label">Browse</label>
             <InputFile class="sr-only" type="file" id="sourceUpload" OnChange="@UploadSource" />
         </div>
-    @if (sourceInfo.Length < 1)
+    @if (sourceInfo.Length < 1 || isSourceFileRequired)
     {
         <p></p>
     }
@@ -26,12 +26,33 @@
 
     <div class="targetinfo">
         <span class="title">Target</span>
-        <div class="fileSearch">
-            <p class="file-name">@targetFileName</p>
-            <label for="targetUpload" class="input-label">Browse</label>
-            <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" />
-        </div>
-    @if (targetInfo.Length < 1)
+        @if(isSourceFileRequired)
+        {
+            <div class="fileSearch">
+                <p class="file-name">Select source file first</p>
+                <label for="targetUpload" class="input-label">Browse</label>
+                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled/>
+            </div>
+
+        }
+        else if (isTargetFileRequired)
+        {
+            <div class="fileSearch">
+                <p class="file-name">Select source file first</p>
+                <label for="targetUpload" class="input-label">Browse</label>
+                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled />
+            </div>
+        }
+        else
+        {
+             <div class="fileSearch">
+                <p class="file-name">@targetFileName</p>
+                <label for="targetUpload" class="input-label">Browse</label>
+                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" />
+             </div>
+        }
+       
+    @if (targetInfo.Length < 1 || isSourceFileRequired || isTargetFileRequired)
     {
         <p></p>
     }
@@ -49,30 +70,59 @@
 <div class="dataAndFilters">
 <div class="filterChoices">    
     <span class="title">Results</span> 
+        @if (isTargetFileRequired || isSourceFileRequired)
+        {
 
-    <input type="text"  @oninput="HandleInput" @bind="searchText" placeholder="Search by ID" />
-        <div class="checkboxes" disabled>
-        <div>
-            <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" />
+            
+            <input type="text"  @oninput="HandleInput" @bind="searchText" placeholder="Search by ID" disabled />
+<p>Target file required</p>
+            <div class="checkboxes" disabled>
+                <div>
+            <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" disabled />
             <label for="removed">Removed</label>
         </div>
         <div>
-            <input type="checkbox" @bind="unchangedChecked" id="unchanged" @oninput="HandleInput3" />
+            <input type="checkbox" @bind="unchangedChecked" id="unchanged" @oninput="HandleInput3" disabled/>
             <label for="unchanged">Unchanged</label>
         </div>
         <div>
-        <input type="checkbox" @bind="modifiedChecked" id="modified" @oninput="HandleInput4" />
+        <input type="checkbox" @bind="modifiedChecked" id="modified" @oninput="HandleInput4" disabled/>
         <label for="modified">Modified</label>
         </div>
         <div>
-            <input type="checkbox" @bind="addedChecked" id="added" @oninput="HandleInput5" />
+            <input type="checkbox" @bind="addedChecked" id="added" @oninput="HandleInput5" disabled/>
             <label for="added">Added</label>
         </div>
-    </div>
-    
+                
+            </div>
+            
+        }
+        else
+        {
+            <input type="text" @oninput="HandleInput" @bind="searchText" placeholder="Search by ID" />
+            <div class="checkboxes" disabled>
+                <div>
+                    <input type="checkbox" @bind="removedChecked" id="removed" @oninput="HandleInput2" />
+                    <label for="removed">Removed</label>
+                </div>
+                <div>
+                    <input type="checkbox" @bind="unchangedChecked" id="unchanged" @oninput="HandleInput3" />
+                    <label for="unchanged">Unchanged</label>
+                </div>
+                <div>
+                    <input type="checkbox" @bind="modifiedChecked" id="modified" @oninput="HandleInput4" />
+                    <label for="modified">Modified</label>
+                </div>
+                <div>
+                    <input type="checkbox" @bind="addedChecked" id="added" @oninput="HandleInput5" />
+                    <label for="added">Added</label>
+                </div>
+            </div>
+        }
+
 </div>
 
-@if (allData == null || !allData.Any())
+@if (allData == null || !allData.Any() || isSourceFileRequired || isTargetFileRequired)
 {
     
     <table class="table">
@@ -123,21 +173,20 @@ else
 
 @code {
     private ModelCFG[] allData;
-
-
     string myValue;
     string[] filters;
     string[] sourceInfo = new string[0];
     string[] targetInfo = new string[0];
     private string searchText ;
-    private bool removedChecked  ;
+    private bool removedChecked ;
     private bool unchangedChecked ;
     private bool modifiedChecked ;
-    private bool addedChecked ;
-    private string sourceFileName = "Select file";
-    private string targetFileName = "Select file";
+    private bool addedChecked  ;
+    private string sourceFileName = "Select a file";
+    private string targetFileName = "Select a file";
     //List<string> selectedFilters = new List<string>();
-    private bool isTargetFileRequired = false;
+    private bool isSourceFileRequired = true;
+    private bool isTargetFileRequired = true;
 
 
     private async Task HandleInput(ChangeEventArgs e)
@@ -242,9 +291,19 @@ else
         if (response.IsSuccessStatusCode)
         {
             sourceInfo = await response.Content.ReadFromJsonAsync<string[]>();
+            isSourceFileRequired = false;
             isTargetFileRequired = true;
+            sourceFileName = file.Name;            
         }
-        sourceFileName = file.Name;
+        else if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            isSourceFileRequired = true;
+            sourceFileName = "Invalid file";
+        }
+        else
+        {
+            isSourceFileRequired = true;
+        }
         StateHasChanged();
         //Console.WriteLine(file.ContentType);
         //var a = JsonSerializer.Serialize(file);
@@ -263,9 +322,20 @@ else
         {
             targetInfo = await response.Content.ReadFromJsonAsync<string[]>();
             isTargetFileRequired = false;
+            targetFileName = file.Name;            
         }
-        targetFileName = file.Name;
-        StateHasChanged();
+        else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            isTargetFileRequired = true;
+            targetFileName = "Invalid file";
+        }
+        else
+        {
+            isTargetFileRequired = true;
+            targetFileName = "Select a file";
+        }
+        StateHasChanged();        
+        
 
         //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadTarget", file);
     }
@@ -338,16 +408,7 @@ else
             default:
                 return "gray";
         }
-    }
-    private string DisableButton(bool required)
-    {
-        if (required)
-        {
-            return "Disabled";
-        }
-
-        return string.Empty;
-    }
+    }   
 
     protected override async Task OnInitializedAsync()
     {
