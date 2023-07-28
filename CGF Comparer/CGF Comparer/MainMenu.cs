@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CGF_Comparer.Models;
 
 namespace CGF_Comparer
 {
@@ -41,16 +42,17 @@ namespace CGF_Comparer
 
             output.DisplayMenu();
             var choice = validator.ValidMenuChoice();   
-            
+
+            Console.Clear();  
             if(choice == 1)
             {
-                Console.Clear();  
+                
                 filterMenu.DisplayFilterMenu(allComparedCfgData,dataHeadings);
                 Console.ReadKey();
             }
             if(choice == 2)
             {
-                Console.Clear();
+                //Console.Clear();
                 output.PrintFilesHeadings(dataHeadings);                
                 output.PrintAllCfgData(allComparedCfgData);
                 counter.DisplayResultsCount(allComparedCfgData);
@@ -58,7 +60,7 @@ namespace CGF_Comparer
             }     
             if (choice == 3) 
             {
-                Console.Clear();
+                //Console.Clear();
                 Console.WriteLine("Enter filter value");
                 var filter = Console.ReadLine();
                 var results = resultsFilter.FilterByID(allComparedCfgData,filter);

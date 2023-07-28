@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CGF_Comparer.Models;
 
 namespace CGF_Comparer
 {
     public class DataComparison
     {
-        readonly List<ModelCFG> allData = new List<ModelCFG>();
-        readonly Dictionary<string, string> targetKeyValuePairs = new Dictionary<string, string>();
-        public List<ModelCFG> GetComparedData(string[] IdValuePair, Dictionary<string, string> sourceKeyValues)
+        private readonly List<ModelCFG> allData = new();
+        private readonly Dictionary<string, string> sourceKeyValuePairs = new();
+        private readonly Dictionary<string, string> targetKeyValuePairs = new();
+        public List<ModelCFG> GetComparedData(string[] sourceIdValuePair, string[] targetIdValuePair )
         {
+            GetSourceFileValues(sourceIdValuePair);
             CompareFiles(IdValuePair, sourceKeyValues);
             AddValuesNotInTarget(sourceKeyValues);
 
@@ -29,7 +32,7 @@ namespace CGF_Comparer
                         ID = IdValuePair[0],
                         SourceValue = IdValuePair[1],
                         TargetValue = IdValuePair[1],
-                        Type = "unchanged"
+                        Type = ResultsType.Unchanged
                     });                    
                 }
                 else if (sourceKeyValues.ContainsKey(IdValuePair[0]) && sourceKeyValues[IdValuePair[0]] != IdValuePair[1])
@@ -39,7 +42,7 @@ namespace CGF_Comparer
                         ID = IdValuePair[0],
                         SourceValue = sourceKeyValues[IdValuePair[0]],
                         TargetValue = IdValuePair[1],
-                        Type = "modified"
+                        Type = ResultsType.Modified
 
                     });                    
                 }
@@ -49,7 +52,7 @@ namespace CGF_Comparer
                     {
                         ID = IdValuePair[0],
                         TargetValue = IdValuePair[1],
-                        Type = "added"
+                        Type = ResultsType.Added
                     });                    
                 }
             }
@@ -64,9 +67,20 @@ namespace CGF_Comparer
                 {
                     ID = keyValue.Key,
                     TargetValue = keyValue.Value,
-                    Type = "removed"
+                    Type = ResultsType.Removed
                 });
             }                     
+        }
+        public void GetSourceFileValues(string[] cfgData)
+        {
+            //Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+
+            for (int i = 6; i < cfgData.Length - 1; i++)
+            {
+
+                var a = cfgData[i].Split(":");
+                sourceKeyValuePairs.Add(a[0], a[1]);
+            }            
         }
     }
 }

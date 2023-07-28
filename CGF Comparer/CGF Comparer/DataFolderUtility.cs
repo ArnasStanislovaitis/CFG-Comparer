@@ -7,9 +7,8 @@ namespace CGF_Comparer
     {
         public string[] GetDataFileNames()
         {
-            var directoryPath = Environment.CurrentDirectory;
-            var projectFolderPath = new DirectoryInfo(directoryPath).Parent.Parent.Parent.ToString();
-            var dataFolderPath = Path.Combine(projectFolderPath, "Data");
+            var directoryPath = AppDomain.CurrentDomain.BaseDirectory;            
+            var dataFolderPath = Path.Combine(directoryPath, "Data");
             var fileNames = Directory.GetFiles(dataFolderPath);
 
             return fileNames;

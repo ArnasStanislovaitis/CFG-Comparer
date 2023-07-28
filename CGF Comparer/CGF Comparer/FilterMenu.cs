@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CGF_Comparer.Models;
 
 namespace CGF_Comparer
 {

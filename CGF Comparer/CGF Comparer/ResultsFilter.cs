@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CGF_Comparer.Models;
 
 namespace CGF_Comparer
 {
@@ -11,7 +12,7 @@ namespace CGF_Comparer
 
             return filteredById;
         }
-        public IEnumerable<ModelCFG> ComparisonResultFilter(List<ModelCFG> data, string filter)
+        public IEnumerable<ModelCFG> ComparisonResultFilter(List<ModelCFG> data, ResultsType filter)
         {
             var comparedResults = data.Where(x => x.Type == filter);
 

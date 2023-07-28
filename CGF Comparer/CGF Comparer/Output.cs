@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using CGF_Comparer.Models;
 
 namespace CGF_Comparer
 {
@@ -20,10 +21,10 @@ namespace CGF_Comparer
             Console.WriteLine($"{"ID",-9}{"Source",-36}{"Target",-33}{"Result",10} ");
             foreach (var item in data)
             {
-                if (item.Type == "unchanged") { colour.GrayText(); }
-                else if (item.Type == "added") { colour.GreenText(); }
-                else if (item.Type == "modified") { colour.YellowText(); }
-                else if (item.Type == "removed") { colour.RedText(); }
+                if (item.Type == ResultsType.Unchanged) { colour.GrayText(); }
+                else if (item.Type == ResultsType.Added) { colour.GreenText(); }
+                else if (item.Type == ResultsType.Modified) { colour.YellowText(); }
+                else if (item.Type == ResultsType.Removed) { colour.RedText(); }
 
                 Console.WriteLine($"{item.ID,-8} {item.SourceValue,-35} {item.TargetValue,-35} {item.Type,10}");
 
@@ -34,7 +35,7 @@ namespace CGF_Comparer
         {
             for (int i = 0; i < 5; i++)
             {
-                Console.WriteLine($"{data[i],-57} {data[i + 6]}");
+                Console.WriteLine($"{data[i], -57} {data[i + 6]}");
             }
             Console.WriteLine();
 
@@ -62,7 +63,7 @@ namespace CGF_Comparer
         {
             Output output = new Output();
             ResultsFilter filter = new ResultsFilter();
-            string[] filters = new string[4] { "unchanged", "removed", "added", "modified" };
+            ResultsType[] filters = new[] { ResultsType.Unchanged, ResultsType.Modified, ResultsType.Added, ResultsType.Removed };
             var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]);            
             output.PrintAllCfgData(filtered);
         } 

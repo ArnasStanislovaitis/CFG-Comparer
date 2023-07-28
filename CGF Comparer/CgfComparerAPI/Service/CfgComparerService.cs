@@ -1,4 +1,5 @@
 ﻿using CGF_Comparer;
+using CGF_Comparer.Models;
 using CgfComparerAPI.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;

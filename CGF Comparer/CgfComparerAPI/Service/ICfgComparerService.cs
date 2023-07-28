@@ -1,4 +1,4 @@
-﻿using CGF_Comparer;
+﻿using CGF_Comparer.Models;
 
 namespace CgfComparerAPI.Service
 {
