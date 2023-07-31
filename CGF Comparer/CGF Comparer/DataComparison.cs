@@ -6,9 +6,10 @@ namespace CGF_Comparer
 {
     public class DataComparison
     {
-        private readonly CfgModel _allCfgData;
+        private readonly CfgModel _allCfgData = new();
         private readonly Dictionary<string, string> _sourceKeyValuePairs = new();
-        private readonly Dictionary<string, string> _targetKeyValuePairs = new();
+        private readonly Dictionary<string, string> _targetKeyValuePairs = new();     
+        
         public CfgModel GetComparedData(string[] sourceCfgFile, string[] targetCfgFile)
         {
             GetSourceFileValues(sourceCfgFile);
@@ -24,8 +25,16 @@ namespace CGF_Comparer
             {   
                 var targetKeyValue = targetCfgFile[i].Split(":");             
                 _targetKeyValuePairs.Add(targetKeyValue[0], targetKeyValue[1]);
-                
-                if (sourceKeyValues.ContainsKey(targetKeyValue[0]) && sourceKeyValues[targetKeyValue[0]] == targetKeyValue[1])
+
+                if (IsFileMetaInfo(targetKeyValue))
+                {
+                    _allCfgData.TargetMetaInfo.Add(new FileMetaInfo
+                    {
+                        ID = targetKeyValue[0],
+                        Value = targetKeyValue[1]
+                    });
+                }
+                else if (sourceKeyValues.ContainsKey(targetKeyValue[0]) && sourceKeyValues[targetKeyValue[0]] == targetKeyValue[1])
                 {
                     _allCfgData.ComparedData.Add(new DataComparisonItem
                     {
@@ -60,9 +69,9 @@ namespace CGF_Comparer
         private void AddValuesNotInTarget(Dictionary<string, string> sourceKeyValues)
         {
             var keysNotInTarget = sourceKeyValues.Where(sourceKeys => !_targetKeyValuePairs.ContainsKey(sourceKeys.Key));
-
+            
             foreach (var keyValue in keysNotInTarget)
-            {
+            {                
                 _allCfgData.ComparedData.Add(new DataComparisonItem
                 {
                     ID = keyValue.Key,
@@ -71,13 +80,35 @@ namespace CGF_Comparer
                 });
             }                     
         }
-        public void GetSourceFileValues(string[] cfgData)
+        private void GetSourceFileValues(string[] sourceCfgFile)
         {            
-            for (int i = 6; i < cfgData.Length - 1; i++)
-            {
-                var keyValue = cfgData[i].Split(":");
-                _sourceKeyValuePairs.Add(keyValue[0], keyValue[1]);
+            for (int i = 0; i < sourceCfgFile.Length - 1; i++)
+            {                
+                var keyValue = sourceCfgFile[i].Split(":");
+
+                if (IsFileMetaInfo(keyValue))
+                {
+                    _allCfgData.SourceMetaInfo.Add(new FileMetaInfo
+                    {
+                        ID = keyValue[0],
+                        Value = keyValue[1]
+                    });
+                }
+                else
+                {
+                    _sourceKeyValuePairs.Add(keyValue[0], keyValue[1]);
+                }
+                
             }            
         }
+        private bool IsFileMetaInfo(string[] cfgKeyValue)
+        {
+            if (!int.TryParse(cfgKeyValue[0], out int o))
+            {      
+                return true;
+            }
+
+            return false;
+        }        
     }
 }

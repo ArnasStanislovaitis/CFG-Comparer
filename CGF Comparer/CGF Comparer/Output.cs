@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CGF_Comparer.Models;
 
 namespace CGF_Comparer
@@ -18,28 +19,42 @@ namespace CGF_Comparer
         public void PrintAllCfgData(IEnumerable<DataComparisonItem> data)
         {
             OutputHelper colour = new OutputHelper();
-            Console.WriteLine($"{"ID",-9}{"Source",-36}{"Target",-33}{"Result",10} ");
+            var maxIdLength = data.Max(x => x.ID.Length);
+            var maxSourceLength = data.Max(x => x.SourceValue.Length);
+            var maxTargetLength = data.Max(x => x.TargetValue.Length);            
+            Console.WriteLine($"{"ID".PadRight(maxIdLength)} {"Source".PadRight(maxSourceLength)} {"Target".PadRight(maxTargetLength)} {"Result"} ");
+
             foreach (var item in data)
             {
                 if (item.Type == ResultsType.Unchanged) { colour.GrayText(); }
                 else if (item.Type == ResultsType.Added) { colour.GreenText(); }
                 else if (item.Type == ResultsType.Modified) { colour.YellowText(); }
                 else if (item.Type == ResultsType.Removed) { colour.RedText(); }
-
-                Console.WriteLine($"{item.ID,-8} {item.SourceValue,-35} {item.TargetValue,-35} {item.Type,10}");
-
+                
+                Console.WriteLine($"{item.ID.PadRight(maxIdLength)} {item.SourceValue.PadRight(maxSourceLength)} {item.TargetValue.PadRight(maxTargetLength)} {item.Type}");
             }
             Console.ForegroundColor = ConsoleColor.Gray;
         }
-        public void PrintFilesHeadings(List<string> data)
+        public void PrintFilesHeadings(CfgModel data)
         {
-            for (int i = 0; i < 5; i++)
+            var maxSourceLength = data.SourceMetaInfo.Max(x => x.Value.Length);
+            var maxTargetLength = data.SourceMetaInfo.Max(x => x.Value.Length);
+            Console.WriteLine("Source information:");
+
+            for (int i = 0; i < data.SourceMetaInfo.Count; i++)
             {
-                Console.WriteLine($"{data[i], -57} {data[i + 6]}");
+                Console.WriteLine($"{data.SourceMetaInfo[i].ID.PadRight(maxSourceLength)} {data.SourceMetaInfo[i].Value}");
+            }
+            Console.WriteLine();
+            Console.WriteLine("Target information:");
+
+            for (int o = 0; o < data.TargetMetaInfo.Count; o++)
+            {
+                Console.WriteLine($"{data.TargetMetaInfo[o].ID.PadRight(maxTargetLength)} {data.TargetMetaInfo[o].Value}");
             }
             Console.WriteLine();
 
-        }
+        }        
         public void DisplayFilterChoices(HashSet<int> set)
         {
             OutputHelper output = new OutputHelper();
