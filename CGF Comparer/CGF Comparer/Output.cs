@@ -15,7 +15,7 @@ namespace CGF_Comparer
                 Console.WriteLine($"{i + 1}. {Path.GetFileName(names[i])}");
             }
         }
-        public void PrintAllCfgData(IEnumerable<ModelCFG> data)
+        public void PrintAllCfgData(IEnumerable<DataComparisonItem> data)
         {
             OutputHelper colour = new OutputHelper();
             Console.WriteLine($"{"ID",-9}{"Source",-36}{"Target",-33}{"Result",10} ");
@@ -59,7 +59,7 @@ namespace CGF_Comparer
                 }
             }
         }
-        public void DisplayFilteredResults(List<ModelCFG> data, int choice)
+        public void DisplayFilteredResults(List<DataComparisonItem> data, int choice)
         {
             Output output = new Output();
             ResultsFilter filter = new ResultsFilter();

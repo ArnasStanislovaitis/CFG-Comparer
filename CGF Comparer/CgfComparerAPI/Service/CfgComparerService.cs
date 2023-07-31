@@ -115,7 +115,7 @@ namespace CgfComparerAPI.Service
 
             return jsonString;
         }
-        public IEnumerable<ModelCFG>? FilterByResult(string filter)
+        public IEnumerable<DataComparisonItem>? FilterByResult(string filter)
         {     
             ResultsFilter resultsFilter = new ();
             var results = resultsFilter.ComparisonResultFilter(allData.ComparisonResults,filter);            
@@ -127,7 +127,7 @@ namespace CgfComparerAPI.Service
 
             return results;
         }
-        public IEnumerable<ModelCFG> FilterByResultAndId(string id, string[] filters)
+        public IEnumerable<DataComparisonItem> FilterByResultAndId(string id, string[] filters)
         {
             ResultsFilter resultsFilter = new();
             var results = allData.ComparisonResults?.Where(x => filters.Contains(x.Type)).ToList();

@@ -7,7 +7,7 @@ namespace CGF_Comparer
 {
     public class Counter
     {
-        public void DisplayResultsCount(List<ModelCFG> data)
+        public void DisplayResultsCount(List<DataComparisonItem> data)
         {
             var unchangedCount = data.Where(x => x.Type == ResultsType.Unchanged).Count();
             var addedCount = data.Where(x => x.Type == ResultsType.Added).Count();

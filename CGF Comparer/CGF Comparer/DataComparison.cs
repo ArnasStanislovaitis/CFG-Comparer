@@ -6,52 +6,52 @@ namespace CGF_Comparer
 {
     public class DataComparison
     {
-        private readonly List<ModelCFG> allData = new();
-        private readonly Dictionary<string, string> sourceKeyValuePairs = new();
-        private readonly Dictionary<string, string> targetKeyValuePairs = new();
-        public List<ModelCFG> GetComparedData(string[] sourceIdValuePair, string[] targetIdValuePair )
+        private readonly CfgModel _allCfgData;
+        private readonly Dictionary<string, string> _sourceKeyValuePairs = new();
+        private readonly Dictionary<string, string> _targetKeyValuePairs = new();
+        public CfgModel GetComparedData(string[] sourceCfgFile, string[] targetCfgFile)
         {
-            GetSourceFileValues(sourceIdValuePair);
-            CompareFiles(IdValuePair, sourceKeyValues);
-            AddValuesNotInTarget(sourceKeyValues);
-
-            return allData;
+            GetSourceFileValues(sourceCfgFile);
+            CompareFiles(_sourceKeyValuePairs, targetCfgFile);
+            AddValuesNotInTarget(_sourceKeyValuePairs);
+            
+            return _allCfgData;
         }
         //IdValuePairs - 40100: 1
-        private void CompareFiles(string[] IdValuePairs, Dictionary<string,string> sourceKeyValues) {            
+        private void CompareFiles(Dictionary<string,string> sourceKeyValues, string[] targetCfgFile) {            
 
-            for (int i = 6; i < IdValuePairs.Length - 1; i++)
+            for (int i = 0; i < targetCfgFile.Length - 1; i++)
             {   
-                var IdValuePair = IdValuePairs[i].Split(":");             
-                targetKeyValuePairs.Add(IdValuePair[0], IdValuePair[1]);
+                var targetKeyValue = targetCfgFile[i].Split(":");             
+                _targetKeyValuePairs.Add(targetKeyValue[0], targetKeyValue[1]);
                 
-                if (sourceKeyValues.ContainsKey(IdValuePair[0]) && sourceKeyValues[IdValuePair[0]] == IdValuePair[1])
+                if (sourceKeyValues.ContainsKey(targetKeyValue[0]) && sourceKeyValues[targetKeyValue[0]] == targetKeyValue[1])
                 {
-                    allData.Add(new ModelCFG
+                    _allCfgData.ComparedData.Add(new DataComparisonItem
                     {
-                        ID = IdValuePair[0],
-                        SourceValue = IdValuePair[1],
-                        TargetValue = IdValuePair[1],
+                        ID = targetKeyValue[0],
+                        SourceValue = targetKeyValue[1],
+                        TargetValue = targetKeyValue[1],
                         Type = ResultsType.Unchanged
                     });                    
                 }
-                else if (sourceKeyValues.ContainsKey(IdValuePair[0]) && sourceKeyValues[IdValuePair[0]] != IdValuePair[1])
+                else if (sourceKeyValues.ContainsKey(targetKeyValue[0]) && sourceKeyValues[targetKeyValue[0]] != targetKeyValue[1])
                 {
-                    allData.Add(new ModelCFG
+                    _allCfgData.ComparedData.Add(new DataComparisonItem
                     {
-                        ID = IdValuePair[0],
-                        SourceValue = sourceKeyValues[IdValuePair[0]],
-                        TargetValue = IdValuePair[1],
+                        ID = targetKeyValue[0],
+                        SourceValue = sourceKeyValues[targetKeyValue[0]],
+                        TargetValue = targetKeyValue[1],
                         Type = ResultsType.Modified
 
                     });                    
                 }
-                else if (!sourceKeyValues.ContainsKey(IdValuePair[0]))
+                else if (!sourceKeyValues.ContainsKey(targetKeyValue[0]))
                 {
-                    allData.Add(new ModelCFG
+                    _allCfgData.ComparedData.Add(new DataComparisonItem
                     {
-                        ID = IdValuePair[0],
-                        TargetValue = IdValuePair[1],
+                        ID = targetKeyValue[0],
+                        TargetValue = targetKeyValue[1],
                         Type = ResultsType.Added
                     });                    
                 }
@@ -59,11 +59,11 @@ namespace CGF_Comparer
         }
         private void AddValuesNotInTarget(Dictionary<string, string> sourceKeyValues)
         {
-            var keysNotInTarget = sourceKeyValues.Where(sourceKeys => !targetKeyValuePairs.ContainsKey(sourceKeys.Key));
+            var keysNotInTarget = sourceKeyValues.Where(sourceKeys => !_targetKeyValuePairs.ContainsKey(sourceKeys.Key));
 
             foreach (var keyValue in keysNotInTarget)
             {
-                allData.Add(new ModelCFG
+                _allCfgData.ComparedData.Add(new DataComparisonItem
                 {
                     ID = keyValue.Key,
                     TargetValue = keyValue.Value,
@@ -72,14 +72,11 @@ namespace CGF_Comparer
             }                     
         }
         public void GetSourceFileValues(string[] cfgData)
-        {
-            //Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-
+        {            
             for (int i = 6; i < cfgData.Length - 1; i++)
             {
-
-                var a = cfgData[i].Split(":");
-                sourceKeyValuePairs.Add(a[0], a[1]);
+                var keyValue = cfgData[i].Split(":");
+                _sourceKeyValuePairs.Add(keyValue[0], keyValue[1]);
             }            
         }
     }

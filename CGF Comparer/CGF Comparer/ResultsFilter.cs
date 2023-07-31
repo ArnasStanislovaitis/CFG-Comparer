@@ -6,13 +6,13 @@ namespace CGF_Comparer
 {
     public class ResultsFilter
     {
-        public IEnumerable<ModelCFG> FilterByID(List<ModelCFG> data, string id)
+        public IEnumerable<DataComparisonItem> FilterByID(List<DataComparisonItem> data, string id)
         {
             var filteredById = data.Where(x => x.ID.StartsWith(id)).Select(x => x);
 
             return filteredById;
         }
-        public IEnumerable<ModelCFG> ComparisonResultFilter(List<ModelCFG> data, ResultsType filter)
+        public IEnumerable<DataComparisonItem> ComparisonResultFilter(List<DataComparisonItem> data, ResultsType filter)
         {
             var comparedResults = data.Where(x => x.Type == filter);
 

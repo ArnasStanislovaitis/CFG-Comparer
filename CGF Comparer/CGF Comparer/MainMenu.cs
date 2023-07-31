@@ -19,7 +19,7 @@ namespace CGF_Comparer
             Counter counter = new ();
 
             List<string> dataHeadings = new List<string>();
-            List<ModelCFG> allComparedCfgData = new List<ModelCFG>();            
+            List<DataComparisonItem> allComparedCfgData = new List<DataComparisonItem>();            
 
             var fileNames = dataFolderUtility.GetDataFileNames();
 
@@ -31,14 +31,14 @@ namespace CGF_Comparer
             }
 
             var chosenFilePaths = filePathUtility.GetChosenPaths(fileNames);    
-            var sourceFileCfgData = readCFG.ReadCFGFile(chosenFilePaths.Item1);
-            var targetFileCfgData = readCFG.ReadCFGFile(chosenFilePaths.Item2);
-            var sourceFileHeading = readCFG.GetFileInformation(sourceFileCfgData);
-            var targetFileHeading = readCFG.GetFileInformation(targetFileCfgData);
+            var sourceCfgFile = readCFG.ReadCFGFile(chosenFilePaths.Item1);
+            var targetCfgFile = readCFG.ReadCFGFile(chosenFilePaths.Item2);
+            var sourceFileHeading = readCFG.GetFileInformation(sourceCfgFile);
+            var targetFileHeading = readCFG.GetFileInformation(targetCfgFile);
             dataHeadings.AddRange(sourceFileHeading);
             dataHeadings.AddRange(targetFileHeading);
             var sourceCfgDataDictionary = readCFG.GetSourceFileValues(sourceFileCfgData);
-            allComparedCfgData = dataComparison.GetComparedData(targetFileCfgData, sourceCfgDataDictionary);
+            allComparedCfgData = dataComparison.GetComparedData(sourceFileCfgData, targetFileCfgData);
 
             output.DisplayMenu();
             var choice = validator.ValidMenuChoice();   

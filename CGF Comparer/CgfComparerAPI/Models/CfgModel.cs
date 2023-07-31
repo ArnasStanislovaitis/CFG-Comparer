@@ -6,6 +6,6 @@ namespace CgfComparerAPI.Models
     {
         public string[]? SourceInformation { get; set; }
         public string[]? TargetInformation { get; set; }
-        public List<ModelCFG>? ComparisonResults {  get; set; } = new List<ModelCFG>();
+        public List<DataComparisonItem>? ComparisonResults {  get; set; } = new List<DataComparisonItem>();
     }
 }

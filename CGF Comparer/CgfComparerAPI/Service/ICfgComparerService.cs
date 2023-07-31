@@ -10,7 +10,7 @@ namespace CgfComparerAPI.Service
         public string[] GetSourceData(IFormFile file);
         public string[] GetTargetData(IFormFile file);
         public string FilterById(string id);
-        public IEnumerable<ModelCFG>? FilterByResult(string filter);
-        public IEnumerable<ModelCFG> FilterByResultAndId(string id, string[] filters);
+        public IEnumerable<DataComparisonItem>? FilterByResult(string filter);
+        public IEnumerable<DataComparisonItem> FilterByResultAndId(string id, string[] filters);
     }
 }

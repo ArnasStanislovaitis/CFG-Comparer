@@ -6,7 +6,7 @@ namespace CGF_Comparer
 {
     public class FilterMenu
     {
-        public void DisplayFilterMenu(List<ModelCFG> cfgData,List<string> dataHeadings)
+        public void DisplayFilterMenu(List<DataComparisonItem> cfgData,List<string> dataHeadings)
         {
             Output output = new();
             InputValidator validator = new();            
