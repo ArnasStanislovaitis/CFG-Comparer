@@ -10,7 +10,7 @@ namespace CGF_Comparer
             
             FilterMenu filterMenu = new();
             ResultsFilter resultsFilter = new();
-            Counter counter = new();
+            
             DataFolderUtility dataFolderUtility = new();
             var fileNames = dataFolderUtility.GetDataFileNames();
 
@@ -27,13 +27,7 @@ namespace CGF_Comparer
             var targetCfgFile = readCFG.ReadCFGFile(chosenFilePaths.Item2);
             CfgModel allData = new();
             DataComparison dataComparison = new();
-            allData = dataComparison.GetComparedData(sourceCfgFile, targetCfgFile);
-            Console.WriteLine(allData.SourceMetaInfo.Count);
-
-            foreach (var item in allData.TargetMetaInfo)
-            {
-                Console.WriteLine(item.ID);
-            }
+            allData = dataComparison.GetComparedData(sourceCfgFile, targetCfgFile);            
 
             bool exitRequested = false;
 
@@ -56,6 +50,7 @@ namespace CGF_Comparer
                     case 2:
                         output.PrintFilesHeadings(allData);
                         output.PrintAllCfgData(allData.ComparedData);
+                        Counter counter = new();
                         counter.DisplayResultsCount(allData.ComparedData);
                         break;
 
@@ -67,7 +62,7 @@ namespace CGF_Comparer
                         output.PrintAllCfgData(results);
                         break;
 
-                    case 0: 
+                    case 4: 
                         exitRequested = true;
                         break;
 

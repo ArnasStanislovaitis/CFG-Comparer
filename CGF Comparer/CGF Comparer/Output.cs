@@ -18,7 +18,9 @@ namespace CGF_Comparer
         }
         public void PrintAllCfgData(IEnumerable<DataComparisonItem> data)
         {
-            OutputHelper colour = new OutputHelper();
+            if (!data.Any()) { return; }
+
+            OutputHelper colour = new OutputHelper();            
             var maxIdLength = data.Max(x => x.ID.Length);
             var maxSourceLength = data.Max(x => x.SourceValue.Length);
             var maxTargetLength = data.Max(x => x.TargetValue.Length);            
@@ -78,14 +80,15 @@ namespace CGF_Comparer
         {
             Output output = new Output();
             ResultsFilter filter = new ResultsFilter();
-            ResultsType[] filters = new[] { ResultsType.Unchanged, ResultsType.Modified, ResultsType.Added, ResultsType.Removed };
-            var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]);            
+            ResultsType[] filters = new[] { ResultsType.Unchanged, ResultsType.Removed, ResultsType.Added, ResultsType.Modified };
+            var filtered = filter.ComparisonResultFilter(data, filters[choice - 1]); 
+            if(filtered == null) { return; }            
             output.PrintAllCfgData(filtered);
         } 
         public void DisplayMenu()
         {
             Console.Clear();
-            string[] menuChoices = new string[3] { "1. Enter result filter menu ", "2. Display all data", "3. Filter by Id" };
+            string[] menuChoices = new string[4] { "1. Enter result filter menu ", "2. Display all data", "3. Filter by Id","4. Exit" };
             foreach (var item in menuChoices)
             {
                 Console.WriteLine(item);

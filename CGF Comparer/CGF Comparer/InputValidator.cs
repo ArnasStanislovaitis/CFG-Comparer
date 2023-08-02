@@ -39,7 +39,7 @@ namespace CGF_Comparer
         {
             Output output = new();
             int choice;            
-            while (!int.TryParse(Console.ReadLine(), out choice) || choice > 3 || choice < 1)
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice > 4 || choice < 1)
             {
                 Console.Clear();
                 Console.WriteLine($"Invalid input. Please enter a number from menu: ");
