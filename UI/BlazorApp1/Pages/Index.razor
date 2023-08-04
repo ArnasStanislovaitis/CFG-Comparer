@@ -1,8 +1,10 @@
 ﻿@page "/"
 @using System.Text.Json;
+@using System.Text;
 @inject HttpClient Http
 
-
+<InputFile OnChange="CompareFilesAsync" />
+<p>@bimbim</p>
 <div class="fileinfo">
     <div class="sourceinfo">
         <span class="title">Source</span>
@@ -11,48 +13,35 @@
             <label for="sourceUpload" class="input-label">Browse</label>
             <InputFile class="sr-only" type="file" id="sourceUpload" OnChange="@UploadSource" />
         </div>
-    @if (sourceInfo.Length < 1 || isSourceFileRequired)
+    @if (allData.SourceMetaInfo.Count < 1 || isSourceFileRequired)
     {
-        <p></p>
+        <p>@allData.SourceMetaInfo.Count</p>
     }
     else
     {    
-        @foreach(var line in sourceInfo)
+        @foreach(var line in allData.SourceMetaInfo)
         {
-            <p class="sourceLine">@line</p>    
+            <p class="sourceLine">@line.ID</p>    
         }    
     }
     </div>
 
     <div class="targetinfo">
-        <span class="title">Target</span>
-        @if(isSourceFileRequired)
-        {
+        <span class="title">Target</span>        
             <div class="fileSearch">
-                <p class="file-name">Select source file first</p>
-                <label for="targetUpload" class="input-label">Browse</label>
-                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled/>
-            </div>
-
-        }        
-        else
-        {
-             <div class="fileSearch">
                 <p class="file-name">@targetFileName</p>
                 <label for="targetUpload" class="input-label">Browse</label>
-                <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" />
-             </div>
-        }
-       
+            <InputFile class="sr-only" type="file" id="targetUpload" OnChange="@UploadTarget" disabled="@isSourceFileRequired" />
+            </div>      
     @if (isSourceFileRequired || isTargetFileRequired)
     {
         <p></p>
     }
     else
     {
-        @foreach (var line in targetInfo)
+        @foreach (var line in allData.TargetMetaInfo)
         {
-            <p class="sourceLine">@line</p>
+            <p class="sourceLine">@line.ID</p>
         }
     }
     </div>
@@ -114,7 +103,7 @@
 
 </div>
 
-@if (allData == null || !allData.Any() || isSourceFileRequired || isTargetFileRequired)
+@if (allData == null || !allData.ComparedData.Any() || isSourceFileRequired || isTargetFileRequired)
 {
     
     <table class="table">
@@ -145,9 +134,9 @@ else
         </thead>
         
         <tbody>
-            @foreach (var item in allData)
+            @foreach (var item in allData.ComparedData)
             {
-                <tr style="background-color: @(GetColor(item.Type))">
+                <tr style="background-color: @(GetColor(item.Type.ToString()))">
                     <td>@item.ID</td>
                     <td>@item.SourceValue</td>
                     <td>@item.TargetValue</td>
@@ -164,7 +153,8 @@ else
 
 
 @code {
-    private ModelCFG[] allData;
+    private CfgModel allData = new();
+    private List<DataComparisonItem> allData2;
     string myValue;
     string[] filters;
     string[] sourceInfo = new string[0];
@@ -175,10 +165,91 @@ else
     private bool modifiedChecked ;
     private bool addedChecked  ;
     private string sourceFileName = "Select a file";
-    private string targetFileName = "Select a file";
+    private string targetFileName = "Select a source file first";
     //List<string> selectedFilters = new List<string>();
     private bool isSourceFileRequired = true;
     private bool isTargetFileRequired = true;
+    int bimbim = 0;
+    IBrowserFile? sourceFile;
+    IBrowserFile? targetFile;
+
+
+
+    private async Task CompareFilesAsync()
+    {        
+
+        if (sourceFile == null || targetFile == null)
+        {
+            // Handle the case where one or both files are not selected
+            return;
+        }
+
+
+        // Create the form data to be sent to the server
+        var formData = new MultipartFormDataContent();
+        formData.Add(new StreamContent(sourceFile.OpenReadStream()), "sourceFile", sourceFile.Name);
+        formData.Add(new StreamContent(targetFile.OpenReadStream()), "targetFile", targetFile.Name);
+
+        // Make the POST request to the server
+        var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadAndCompareFiles", formData);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Process the response, which contains the compared data in the body
+            var result = await response.Content.ReadFromJsonAsync<CfgModel>();
+            bimbim = result.SourceMetaInfo.Count();
+            // Do something with the 'result' data
+        }
+        else
+        {
+            // Handle the case where the request was not successful
+            // You can check the response.StatusCode for the specific status code returned
+        }
+    }
+    public async void UploadSource(InputFileChangeEventArgs e)
+    {
+
+        var file = e.File;
+
+        if (file != null)
+        {            
+            isSourceFileRequired = false;
+            isTargetFileRequired = true;
+            sourceFile = e.File;
+            sourceFileName = file.Name;
+            targetFileName = "Select a file";
+            StateHasChanged();
+
+        }
+        else
+        {
+            isSourceFileRequired = true;
+            sourceFileName = "Invalid file";
+        }        
+
+        //Console.WriteLine(file.ContentType);
+        //var a = JsonSerializer.Serialize(file);
+        //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadSource", a);
+        //Console.Write(p.StatusCode);
+    }
+    private async Task UploadTarget(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+            targetFile = e.File;
+            targetFileName = file.Name;
+            isTargetFileRequired = false;
+            StateHasChanged();
+
+            // Check if both files are selected and call the comparison method
+            if (sourceFile != null && targetFile != null)
+            {
+                await CompareFilesAsync();
+            }
+        }
+    }
 
 
     private async Task HandleInput(ChangeEventArgs e)
@@ -190,7 +261,7 @@ else
     {
         //searchText = e.Value.ToString();
         removedChecked = (bool)e.Value;
-        HandleCheckboxChange("removed", removedChecked);
+        HandleCheckboxChange("Removed", removedChecked);
 
         await UpdateSearch();
     }
@@ -198,7 +269,7 @@ else
     {
         //searchText = e.Value.ToString();
         unchangedChecked = (bool)e.Value;
-        HandleCheckboxChange("unchanged", unchangedChecked);
+        HandleCheckboxChange("Unchanged", unchangedChecked);
 
         await UpdateSearch();
     }
@@ -206,7 +277,7 @@ else
     {
         //searchText = e.Value.ToString();
         modifiedChecked = (bool)e.Value;
-        HandleCheckboxChange("modified", modifiedChecked);
+        HandleCheckboxChange("Modified", modifiedChecked);
 
         await UpdateSearch();
     }
@@ -214,7 +285,7 @@ else
     {
         //searchText = e.Value.ToString();
         addedChecked = (bool)e.Value;
-        HandleCheckboxChange("added", addedChecked);
+        HandleCheckboxChange("Added", addedChecked);
 
         await UpdateSearch();
     }
@@ -267,43 +338,44 @@ else
 
     public async void HandleSubmit(string id)
     {        
-        allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterById/{id}");
+        //allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterById/{id}");
 
     }
 
-
+    /*
     public async void UploadSource(InputFileChangeEventArgs e)
     {
 
-        var file = e.File;
-        var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadSource", new MultipartFormDataContent
+    var file = e.File;
+    var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadSource", new MultipartFormDataContent
     {
-        { new StreamContent(file.OpenReadStream()), "file", file.Name }
+    { new StreamContent(file.OpenReadStream()), "file", file.Name }
     });
-        if (response.IsSuccessStatusCode)
-        {
-            sourceInfo = await response.Content.ReadFromJsonAsync<string[]>();
-            isSourceFileRequired = false;
-            isTargetFileRequired = true;
-            sourceFileName = file.Name;  
-            targetFileName = "Select a file";
-        }
-        else if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-        {
-            isSourceFileRequired = true;
-            sourceFileName = "Invalid file";
-        }
-        else
-        {
-            isSourceFileRequired = true;
-        }
-        StateHasChanged();
-        //Console.WriteLine(file.ContentType);
-        //var a = JsonSerializer.Serialize(file);
-        //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadSource", a);
-        //Console.Write(p.StatusCode);
+    if (response.IsSuccessStatusCode)
+    {
+    sourceInfo = await response.Content.ReadFromJsonAsync<string[]>();
+    isSourceFileRequired = false;
+    isTargetFileRequired = true;
+    sourceFileName = file.Name;  
+    targetFileName = "Select a file";
     }
-    public async void UploadTarget(InputFileChangeEventArgs e)
+    else if(response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+    {
+    isSourceFileRequired = true;
+    sourceFileName = "Invalid file";
+    }
+    else
+    {
+    isSourceFileRequired = true;
+    }
+    StateHasChanged();
+    //Console.WriteLine(file.ContentType);
+    //var a = JsonSerializer.Serialize(file);
+    //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadSource", a);
+    //Console.Write(p.StatusCode);
+    }
+    */
+    public async void UploadTarget2(InputFileChangeEventArgs e)
     {
         var file = e.File;
         var response = await Http.PostAsync("https://localhost:7219/api/CfgComparer/UploadTarget", new MultipartFormDataContent
@@ -311,7 +383,7 @@ else
         { new StreamContent(file.OpenReadStream()), "file", file.Name }
     });
 
-        
+
         if (response.IsSuccessStatusCode)
         {            
             targetInfo = await response.Content.ReadFromJsonAsync<string[]>();
@@ -329,7 +401,7 @@ else
             targetFileName = "Select a file";            
         }
         StateHasChanged();        
-        
+
 
         //var p = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/UploadTarget", file);
     }
@@ -339,7 +411,35 @@ else
         {
         allData = await Http.GetFromJsonAsync<ModelCFG[]>($" https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=unchanged&filters=modified&filters=added&filters=removed");
     }*/
-    public async Task<IEnumerable<ModelCFG>> GetAll(string id = "", IEnumerable<string> filters = null)
+    public async Task<CfgModel> GetAll(string id = "", IEnumerable<string> filters = null)
+    {
+        string jsonString = JsonSerializer.Serialize<CfgModel>(allData);
+
+        string apiUrl = "https://localhost:7219/api/CfgComparer/FilterByIdAndResults";
+        //var response = await Http.PostAsJsonAsync<CfgModel>(apiUrl + "?id=" + id);
+
+        // Prepare the HttpContent with the request body data
+        //HttpContent content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+        using var httpClient = new HttpClient();
+        using var content = new StringContent(JsonSerializer.Serialize(allData), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"{apiUrl}?id={id}&filters={string.Join(",", filters)}", content);
+
+
+        //var filteredData = await Http.PostAsync("https://localhost:7219/api/CfgComparer/FilterByIdAndResults", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            allData = await response.Content.ReadFromJsonAsync<CfgModel>();
+            return allData;
+        }
+        else
+        {
+            return new CfgModel();
+            // Or you can throw an exception here as before.
+        }
+    }
+    public async void GetAll2(string id = "", IEnumerable<string> filters = null)
     {
         string baseUrl = "https://localhost:7219/api/CfgComparer/FilterByIdResults";
 
@@ -368,15 +468,16 @@ else
         var a = await Http.GetAsync(url);
         if (a.IsSuccessStatusCode)
         {
-            allData = await a.Content.ReadFromJsonAsync<ModelCFG[]>();     
-            return allData;
+            allData = await a.Content.ReadFromJsonAsync<CfgModel>();     
+            //return allData;
         }
         else
         {
-            allData =  new ModelCFG[0];
-            return allData;
+            allData =  new CfgModel();
+            //return allData;
             throw new Exception($"Error getting data. Status code: {a.StatusCode}");
         }
+
         /*
         var b = a.Result;
         allData = a.
@@ -387,6 +488,7 @@ else
         allData = await Http.GetFromJsonAsync<ModelCFG[]>(url);
         return allData;*/
     }
+    
     private string GetColor(string type)
     {
         switch (type)
@@ -409,20 +511,33 @@ else
         //allData = await Http.GetFromJsonAsync<CfgModel>("https://localhost:7219/api/CfgComparer");
         //allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterByIdResults?filters=unchanged&filters=modified&filters=added");
     }
-    public class ModelCFG
+    
+    public class CfgModel
     {
-        public ModelCFG() { }
+        public List<FileMetaInfo> SourceMetaInfo { get; set; } = new();
+        public List<FileMetaInfo> TargetMetaInfo { get; set; } = new();
+        public List<DataComparisonItem> ComparedData { get; set; } = new();
+    }
+
+    public class DataComparisonItem
+    {
+        public DataComparisonItem() { }
         public string ID { get; set; }
         public string SourceValue { get; set; } = string.Empty;
         public string TargetValue { get; set; } = string.Empty;
-        public string Type { get; set; }
+        public ResultsType Type { get; set; }
+    }
+    public class FileMetaInfo
+    {
+        public string ID { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
+    public enum ResultsType
+    {
+        Unchanged,
+        Added,
+        Modified,
+        Removed
     }
 
-    public class CfgModel
-    {
-        public string[]? SourceInformation { get; set; }
-        public string[]? TargetInformation { get; set; }
-        public List<ModelCFG>? ComparisonResults { get; set; } = new List<ModelCFG>();
-    }
-    
 }

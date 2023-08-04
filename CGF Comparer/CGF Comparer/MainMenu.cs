@@ -6,11 +6,7 @@ namespace CGF_Comparer
     public class MainMenu
     {
         public void Menu()
-        {           
-            
-            FilterMenu filterMenu = new();
-            ResultsFilter resultsFilter = new();
-            
+        {   
             DataFolderUtility dataFolderUtility = new();
             var fileNames = dataFolderUtility.GetDataFileNames();
 
@@ -27,12 +23,11 @@ namespace CGF_Comparer
             var targetCfgFile = readCFG.ReadCFGFile(chosenFilePaths.Item2);
             CfgModel allData = new();
             DataComparison dataComparison = new();
-            allData = dataComparison.GetComparedData(sourceCfgFile, targetCfgFile);            
-
+            allData = dataComparison.GetComparedData(sourceCfgFile, targetCfgFile);
             bool exitRequested = false;
 
             while (!exitRequested)
-            {
+            {                
                 Output output = new();
                 output.DisplayMenu();
                 InputValidator validator = new();
@@ -43,7 +38,7 @@ namespace CGF_Comparer
                 switch (choice)
                 {
                     case 1:
-                        
+                        FilterMenu filterMenu = new();
                         filterMenu.DisplayFilterMenu(allData);
                         break;
 
@@ -57,6 +52,7 @@ namespace CGF_Comparer
                     case 3:
                         Console.WriteLine("Enter filter value");
                         var filter = Console.ReadLine();
+                        ResultsFilter resultsFilter = new();
                         var results = resultsFilter.FilterByID(allData.ComparedData, filter);
                         output.PrintFilesHeadings(allData);
                         output.PrintAllCfgData(results);

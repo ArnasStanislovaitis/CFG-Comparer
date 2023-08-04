@@ -3,7 +3,11 @@ using CGF_Comparer.Models;
 using CgfComparerAPI.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using System.IO.Compression;
+using System.IO;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+
 namespace CgfComparerAPI.Service
 {
     public class CfgComparerService : ICfgComparerService
@@ -18,7 +22,7 @@ namespace CgfComparerAPI.Service
 
             return jsonString;
         }
-        
+
 
         //                 VERSION 1
         /*
@@ -54,6 +58,37 @@ namespace CgfComparerAPI.Service
         */
         //            VERSION2
 
+        public string[]? ReadFileWithoutSaving(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return default;
+            }
+
+            using (var fileStream = file.OpenReadStream())
+            {
+                using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
+                {
+                    using (var streamReader = new StreamReader(gzipStream))
+                    {
+                        var allIdValuePairs = streamReader.ReadToEnd().Split(";");
+
+                        return allIdValuePairs;
+                    }
+                }
+            }                
+        }
+
+        public CfgModel GetComparedCfgData(IFormFile sourceCfgFile, IFormFile targetCfgFile)
+        {
+            var sourceCfgFileString = ReadFileWithoutSaving(sourceCfgFile);
+            var targetCfgFileString = ReadFileWithoutSaving(targetCfgFile);
+            DataComparison comparison = new DataComparison();
+            var comparedCfgData =  comparison.GetComparedData(sourceCfgFileString, targetCfgFileString);
+
+            return comparedCfgData;
+        }
+        /*
         public string[] GetTargetData(IFormFile file)
         {
             DataComparison comp = new DataComparison();
@@ -127,10 +162,11 @@ namespace CgfComparerAPI.Service
 
             return results;
         }
-        public IEnumerable<DataComparisonItem> FilterByResultAndId(string id, string[] filters)
+        */
+        public IEnumerable<DataComparisonItem> FilterByResultAndId([FromBody] CfgModel cfgData, string id, string[] filters)
         {
             ResultsFilter resultsFilter = new();
-            var results = allData.ComparisonResults?.Where(x => filters.Contains(x.Type)).ToList();
+            var results = cfgData.ComparedData.Where(x => filters.Contains(x.Type.ToString())).ToList();
 
             if(string.IsNullOrEmpty(id) && results.Any())
             {
@@ -145,5 +181,6 @@ namespace CgfComparerAPI.Service
 
             return filteredResults;
         }
+        
     }
 }

@@ -4,8 +4,8 @@ namespace CGF_Comparer
 {
     public class FilePathUtility
     {       
-        string sourcePath = string.Empty;
-        string targetPath = string.Empty;
+        private string _sourcePath = string.Empty;
+        private string _targetPath = string.Empty;
         public (string,string) GetChosenPaths (string[] fileNames)
         {
             InputValidator inputValidator = new();
@@ -18,11 +18,11 @@ namespace CGF_Comparer
                 return default;
             }
             choice = inputValidator.ValidPathChoice(fileNames, choice);                       
-            sourcePath = fileNames[choice - 1];
+            _sourcePath = fileNames[choice - 1];
             choice = inputValidator.ValidPathChoice(fileNames, choice);                
-            targetPath = fileNames[choice - 1];            
+            _targetPath = fileNames[choice - 1];            
             
-            return (sourcePath, targetPath);
+            return (_sourcePath, _targetPath);
         }                
     }        
 }

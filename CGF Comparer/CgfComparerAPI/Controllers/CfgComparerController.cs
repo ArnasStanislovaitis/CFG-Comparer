@@ -1,4 +1,5 @@
-﻿using CgfComparerAPI.Service;
+﻿using CGF_Comparer.Models;
+using CgfComparerAPI.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CgfComparerAPI.Controllers
@@ -27,6 +28,19 @@ namespace CgfComparerAPI.Controllers
 
             return Ok(allData);
         }
+
+        [HttpPost]
+        [Route("UploadAndCompareFiles")]
+        public async Task<IActionResult> UploadAndCompareFiles(IFormFile sourceFile,IFormFile targetFile) 
+        {
+            var allData = service.GetComparedCfgData(sourceFile, targetFile);
+
+            return Ok(allData);
+        }
+
+
+
+        /*
         [HttpPost]
         [Route("UploadSource")]
         [ProducesResponseType(200)]
@@ -111,16 +125,16 @@ namespace CgfComparerAPI.Controllers
 
             return Ok(filteredResults);
         }
-
-        [HttpGet]
+        */
+        [HttpPost]
         [Route("FilterByIdResults")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> FilterByIdAndResults(string? id, [FromQuery] string[] filters)
+        public async Task<IActionResult> FilterByIdAndResults([FromBody] CfgModel cfgData, string? id, [FromQuery] string[] filters)
         {
             //if (string.IsNullOrEmpty(id))            {                return BadRequest();            }
-            var filteredData = service.FilterByResultAndId(id!, filters);            
+            var filteredData = service.FilterByResultAndId(cfgData, id!, filters);            
 
             if (filteredData == null || !filteredData.Any())
             {
@@ -129,5 +143,6 @@ namespace CgfComparerAPI.Controllers
 
             return Ok(filteredData);
         }
+        
     }
 }
