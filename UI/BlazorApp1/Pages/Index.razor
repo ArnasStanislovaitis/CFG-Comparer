@@ -39,7 +39,7 @@
     {
         @foreach (var line in allData.TargetMetaInfo)
         {
-            <p class="sourceLine">@line.ID</p>
+                <p class="sourceLine">@line.ID: @line.Value</p>
         }
     }
     </div>
@@ -132,7 +132,7 @@ else
         </thead>
         
         <tbody>
-            @foreach (var item in allData.ComparedData)
+            @foreach (var item in allData2)
             {
                 <tr style="background-color: @(GetColor(item.Type.ToString()))">
                     <td>@item.ID</td>
@@ -158,10 +158,10 @@ else
     string[] sourceInfo = new string[0];
     string[] targetInfo = new string[0];
     private string searchText ;
-    private bool removedChecked ;
-    private bool unchangedChecked ;
-    private bool modifiedChecked ;
-    private bool addedChecked  ;
+    private bool removedChecked =true ;
+    private bool unchangedChecked = true;
+    private bool modifiedChecked = true;
+    private bool addedChecked= true  ;
     private string sourceFileName = "Select a file";
     private string targetFileName = "Select a source file first";
     //List<string> selectedFilters = new List<string>();
@@ -196,6 +196,7 @@ else
             var result = await response.Content.ReadFromJsonAsync<CfgModel>();
             allData = result;
             bimbim = result.SourceMetaInfo.Count();
+            await UpdateSearch();
             // Do something with the 'result' data
         }
         else
@@ -208,8 +209,8 @@ else
     {
 
         var file = e.File;
-
-        if (file != null)
+        var extension = Path.GetExtension(file.Name);
+        if (file != null && extension ==".cfg")
         {            
             isSourceFileRequired = false;
             isTargetFileRequired = true;
@@ -233,8 +234,9 @@ else
     private async Task UploadTarget(InputFileChangeEventArgs e)
     {
         var file = e.File;
-
-        if (file != null)
+        var extension = Path.GetExtension(file.Name);
+        
+        if (file != null && extension ==".cfg")
         {
             targetFile = e.File;
             targetFileName = file.Name;
@@ -319,7 +321,7 @@ else
     }
 
 
-    private List<string> selectedFilters = new List<string>();
+    private List<string> selectedFilters = new List<string>(){"Added","Unchanged","Removed","Modified"};
 
 
     private void HandleCheckboxChange(string filter, bool isChecked)
@@ -406,29 +408,78 @@ else
 
     /*
     public async void GetAll(string id = "")
-        {
-        allData = await Http.GetFromJsonAsync<ModelCFG[]>($" https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=unchanged&filters=modified&filters=added&filters=removed");
+    {
+    allData = await Http.GetFromJsonAsync<ModelCFG[]>($" https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=unchanged&filters=modified&filters=added&filters=removed");
     }*/
+    /*
     public async Task<CfgModel> GetAll(string id = "", IEnumerable<string> filters = null)
     {
-        string jsonString = JsonSerializer.Serialize<CfgModel>(allData);
+    string jsonString = JsonSerializer.Serialize<CfgModel>(allData);
 
-        string apiUrl = "https://localhost:7219/api/CfgComparer/FilterByIdAndResults";
-        //var response = await Http.PostAsJsonAsync<CfgModel>(apiUrl + "?id=" + id);
+    string apiUrl = "https://localhost:7219/api/CfgComparer/FilterByIdAndResults";
+    //var response = await Http.PostAsJsonAsync<CfgModel>(apiUrl + "?id=" + id);
 
-        // Prepare the HttpContent with the request body data
-        //HttpContent content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+    // Prepare the HttpContent with the request body data
+    //HttpContent content = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-        using var httpClient = new HttpClient();
-        using var content = new StringContent(JsonSerializer.Serialize(allData), Encoding.UTF8, "application/json");
-        //var response = await httpClient.PostAsync($"{apiUrl}?id={id}&filters={string.Join(",", filters)}", content);
+    using var httpClient = new HttpClient();
+    using var content = new StringContent(JsonSerializer.Serialize<CfgModel>(allData), Encoding.UTF8, "application/json");
+    //var response = await httpClient.PostAsync($"{apiUrl}?id={id}&filters={string.Join(",", filters)}", content);
 
-        
-        var response = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=Added", jsonString);
+
+    var response = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=Added", content);    
 
         if (response.IsSuccessStatusCode)
         {
-            allData = await response.Content.ReadFromJsonAsync<CfgModel>();
+        allData = await response.Content.ReadFromJsonAsync<CfgModel>();
+        return allData;
+        }
+        else
+        {
+        return new CfgModel();
+        // Or you can throw an exception here as before.
+    }
+    }*/
+    public async Task<CfgModel> GetAll(string id = "", IEnumerable<string> filters = null)
+    {
+        string apiUrl = "https://localhost:7219/api/CfgComparer/FilterByIdResults";
+
+        using var httpClient = new HttpClient();
+
+        // Prepare the HttpContent with the request body data
+        var content = new StringContent(JsonSerializer.Serialize(allData), Encoding.UTF8, "application/json");
+
+        // Construct the URL with query parameters
+        var queryString = $"?id={id}&filters={(string.Join("&filters=", filters ?? Enumerable.Empty<string>()))}";
+        var requestUrl = apiUrl + queryString;
+
+        var response = await httpClient.PostAsync(requestUrl, content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonString = await response.Content.ReadAsStringAsync();
+            try
+            {
+                allData2 = JsonSerializer.Deserialize<List<DataComparisonItem>>(jsonString, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true // Use this if the JSON property names are in different casing.
+                    });
+                return allData;
+            }
+            catch (JsonException ex)
+            {
+                // Log or handle the exception here.
+                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+                return new CfgModel(); // Or throw an exception if preferred.
+            }
+
+            return allData;
+        }
+        else if(!response.IsSuccessStatusCode)
+        {
+            allData2 = new List<DataComparisonItem>();
+            
+
             return allData;
         }
         else
@@ -437,6 +488,7 @@ else
             // Or you can throw an exception here as before.
         }
     }
+
     public async void GetAll2(string id = "", IEnumerable<string> filters = null)
     {
         string baseUrl = "https://localhost:7219/api/CfgComparer/FilterByIdResults";
@@ -486,7 +538,7 @@ else
         allData = await Http.GetFromJsonAsync<ModelCFG[]>(url);
         return allData;*/
     }
-    
+
     private string GetColor(string type)
     {
         switch (type)
@@ -509,9 +561,13 @@ else
         //allData = await Http.GetFromJsonAsync<CfgModel>("https://localhost:7219/api/CfgComparer");
         //allData = await Http.GetFromJsonAsync<ModelCFG[]>($"https://localhost:7219/api/CfgComparer/FilterByIdResults?filters=unchanged&filters=modified&filters=added");
     }
-    
+
     public class CfgModel
     {
+        public CfgModel()
+        {
+            
+        }
         public List<FileMetaInfo> SourceMetaInfo { get; set; } = new();
         public List<FileMetaInfo> TargetMetaInfo { get; set; } = new();
         public List<DataComparisonItem> ComparedData { get; set; } = new();
