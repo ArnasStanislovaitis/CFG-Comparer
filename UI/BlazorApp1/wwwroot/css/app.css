@@ -101,17 +101,14 @@ a, .btn-link {
     }
 
 .sourceinfo {
-    border: 1px solid #ccc;
-    height: 300px;
+    border: 1px solid #ccc;    
     width: 600px;
     border-radius: 6px;
     box-shadow: 1px 2px 10px 0px rgba(0,0,0,0.3);
 }
-.targetinfo {
-    height: 300px;
+.targetinfo {    
     width: 600px;
-    border: 1px solid #ccc;
-    
+    border: 1px solid #ccc;    
     border-radius: 6px;
     box-shadow: 1px 2px 10px 0px rgba(0,0,0,0.3);
 }

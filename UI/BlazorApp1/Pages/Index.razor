@@ -3,8 +3,6 @@
 @using System.Text;
 @inject HttpClient Http
 
-<InputFile OnChange="CompareFilesAsync" />
-<p>@bimbim</p>
 <div class="fileinfo">
     <div class="sourceinfo">
         <span class="title">Source</span>
@@ -21,7 +19,7 @@
     {    
         @foreach(var line in allData.SourceMetaInfo)
         {
-            <p class="sourceLine">@line.ID</p>    
+            <p class="sourceLine">@line.ID: @line.Value</p>    
         }    
     }
     </div>
@@ -174,7 +172,6 @@ else
     IBrowserFile? targetFile;
 
 
-
     private async Task CompareFilesAsync()
     {        
 
@@ -197,6 +194,7 @@ else
         {
             // Process the response, which contains the compared data in the body
             var result = await response.Content.ReadFromJsonAsync<CfgModel>();
+            allData = result;
             bimbim = result.SourceMetaInfo.Count();
             // Do something with the 'result' data
         }
@@ -423,10 +421,10 @@ else
 
         using var httpClient = new HttpClient();
         using var content = new StringContent(JsonSerializer.Serialize(allData), Encoding.UTF8, "application/json");
-        var response = await httpClient.PostAsync($"{apiUrl}?id={id}&filters={string.Join(",", filters)}", content);
+        //var response = await httpClient.PostAsync($"{apiUrl}?id={id}&filters={string.Join(",", filters)}", content);
 
-
-        //var filteredData = await Http.PostAsync("https://localhost:7219/api/CfgComparer/FilterByIdAndResults", content);
+        
+        var response = await Http.PostAsJsonAsync("https://localhost:7219/api/CfgComparer/FilterByIdResults?id=50&filters=Added", jsonString);
 
         if (response.IsSuccessStatusCode)
         {
@@ -493,13 +491,13 @@ else
     {
         switch (type)
         {
-            case "unchanged":
+            case "Unchanged":
                 return "#DCDCDC";
-            case "added":
+            case "Added":
                 return "#98FB98";
-            case "modified":
+            case "Modified":
                 return "#FFFFE0";
-            case "removed":
+            case "Removed":
                 return "#FFCCCC";
             default:
                 return "gray";

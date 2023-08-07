@@ -163,7 +163,7 @@ namespace CgfComparerAPI.Service
             return results;
         }
         */
-        public IEnumerable<DataComparisonItem> FilterByResultAndId([FromBody] CfgModel cfgData, string id, string[] filters)
+        public IEnumerable<DataComparisonItem> FilterByResultAndId([FromBody] CfgModel cfgData, string id, [FromQuery] string[] filters)
         {
             ResultsFilter resultsFilter = new();
             var results = cfgData.ComparedData.Where(x => filters.Contains(x.Type.ToString())).ToList();
