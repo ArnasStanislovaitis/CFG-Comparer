@@ -1,10 +1,9 @@
-﻿using CGF_Comparer.Models;
+﻿using ComparerLibrary;
 
 namespace CgfComparerAPI.Service
 {
     public interface ICfgComparerService
-    {
-        public string GetComparedData();
+    {        
         //public string[] ReadFile(IFormFile file);
         //public string ReadFile2(IFormFile file);
         //public string[] GetSourceData(IFormFile file);

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using ComparerLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using CGF_Comparer.Models;
 
-namespace CGF_Comparer
+
+namespace CFG_Comparer
 {
     public class Counter
     {

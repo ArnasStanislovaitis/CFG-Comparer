@@ -1,4 +1,4 @@
-﻿namespace CGF_Comparer.Models
+﻿namespace ComparerLibrary
 {
     public enum ResultsType
     {

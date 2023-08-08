@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     public class InputValidator
     {

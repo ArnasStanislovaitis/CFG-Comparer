@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     public class ReadCFG
     {

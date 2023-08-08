@@ -1,6 +1,5 @@
-﻿using CGF_Comparer;
-using CGF_Comparer.Models;
-using CgfComparerAPI.Models;
+﻿using CFG_Comparer;
+using ComparerLibrary;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using System.IO.Compression;
@@ -11,17 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CgfComparerAPI.Service
 {
     public class CfgComparerService : ICfgComparerService
-    {
-        private static CfgModel allData = new ();
-        private static Dictionary<string, string> sourceCfgDataDictionary = new();        
-        
-        public string GetComparedData()
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string jsonString = JsonSerializer.Serialize(allData, options);
-
-            return jsonString;
-        }
+    {     
 
 
         //                 VERSION 1
@@ -88,6 +77,26 @@ namespace CgfComparerAPI.Service
 
             return comparedCfgData;
         }
+
+        public IEnumerable<DataComparisonItem> FilterByResultAndId([FromBody] CfgModel cfgData, string id, [FromQuery] string[] filters)
+        {
+            ResultsFilter resultsFilter = new();
+            var results = cfgData.ComparedData.Where(x => filters.Contains(x.Type.ToString())).ToList();
+
+            if(string.IsNullOrEmpty(id) && results.Any())
+            {
+                return results;
+            }
+            var filteredResults = resultsFilter.FilterByID(results, id);
+            
+            if (filteredResults == null || !filteredResults.Any())
+            {
+                return default;
+            }
+
+            return filteredResults;
+        }   
+
         /*
         public string[] GetTargetData(IFormFile file)
         {
@@ -162,25 +171,6 @@ namespace CgfComparerAPI.Service
 
             return results;
         }
-        */
-        public IEnumerable<DataComparisonItem> FilterByResultAndId([FromBody] CfgModel cfgData, string id, [FromQuery] string[] filters)
-        {
-            ResultsFilter resultsFilter = new();
-            var results = cfgData.ComparedData.Where(x => filters.Contains(x.Type.ToString())).ToList();
-
-            if(string.IsNullOrEmpty(id) && results.Any())
-            {
-                return results;
-            }
-            var filteredResults = resultsFilter.FilterByID(results, id);
-            
-            if (filteredResults == null || !filteredResults.Any())
-            {
-                return default;
-            }
-
-            return filteredResults;
-        }
-        
+        */           
     }
 }

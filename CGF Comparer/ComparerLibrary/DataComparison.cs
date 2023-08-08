@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CGF_Comparer.Models;
 
-namespace CGF_Comparer
+namespace ComparerLibrary
 {
     public class DataComparison
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CGF_Comparer.Models
+namespace ComparerLibrary
 {
     public class DataComparisonItem
     {

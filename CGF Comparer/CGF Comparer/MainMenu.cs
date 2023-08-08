@@ -1,7 +1,7 @@
 ﻿using System;
-using CGF_Comparer.Models;
+using ComparerLibrary;
 
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     public class MainMenu
     {

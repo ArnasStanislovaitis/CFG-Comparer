@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace CGF_Comparer.Models
-{
+namespace ComparerLibrary 
+{ 
     public class CfgModel
     {
         public List<FileMetaInfo> SourceMetaInfo { get; set; } = new();

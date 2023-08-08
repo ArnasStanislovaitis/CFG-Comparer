@@ -1,4 +1,4 @@
-﻿using CGF_Comparer.Models;
+﻿using ComparerLibrary;
 using CgfComparerAPI.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,37 +8,47 @@ namespace CgfComparerAPI.Controllers
     [ApiController]
     public class CfgComparerController : ControllerBase
     {
-        private readonly ICfgComparerService service;
+        private readonly ICfgComparerService _service;
         public CfgComparerController(ICfgComparerService service)
         {
-            this.service = service;
-        }
-
-        [HttpGet]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(204)]
-        public async Task<IActionResult> GetAllResults()
-        {
-            var allData = service.GetComparedData();            
-
-            if(allData == null || !allData.Any()) 
-            {
-                return NoContent();
-            }
-
-            return Ok(allData);
-        }
+            _service = service;
+        }        
 
         [HttpPost]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
         [Route("UploadAndCompareFiles")]
         public async Task<IActionResult> UploadAndCompareFiles(IFormFile sourceFile,IFormFile targetFile) 
         {
-            var allData = service.GetComparedCfgData(sourceFile, targetFile);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var allData = _service.GetComparedCfgData(sourceFile, targetFile);
 
+            if(!allData.ComparedData.Any()) 
+            {
+                return BadRequest();
+            }
             return Ok(allData);
+        } 
+
+        [HttpPost]
+        [Route("FilterByIdResults")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> FilterByIdAndResults([FromBody] CfgModel cfgData, string? id, [FromQuery] string[] filters)
+        {            
+            var filteredData = _service.FilterByResultAndId(cfgData, id!, filters);            
+
+            if (filteredData == null || !filteredData.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(filteredData);
         }
-
-
 
         /*
         [HttpPost]
@@ -125,24 +135,6 @@ namespace CgfComparerAPI.Controllers
 
             return Ok(filteredResults);
         }
-        */
-        [HttpPost]
-        [Route("FilterByIdResults")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> FilterByIdAndResults([FromBody] CfgModel cfgData, string? id, [FromQuery] string[] filters)
-        {
-            //if (string.IsNullOrEmpty(id))            {                return BadRequest();            }
-            var filteredData = service.FilterByResultAndId(cfgData, id!, filters);            
-
-            if (filteredData == null || !filteredData.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(filteredData);
-        }
-        
+        */            
     }
 }

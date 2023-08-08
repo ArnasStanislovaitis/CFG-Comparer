@@ -1,5 +1,5 @@
 ﻿
-namespace CGF_Comparer.Models
+namespace ComparerLibrary
 {
     public class FileMetaInfo
     {

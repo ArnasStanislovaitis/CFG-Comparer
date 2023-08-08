@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     public class OutputHelper
     {

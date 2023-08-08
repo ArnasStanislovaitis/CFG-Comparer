@@ -1,5 +1,5 @@
 ﻿
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     internal class Program
     {       

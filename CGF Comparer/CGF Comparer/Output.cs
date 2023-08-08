@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CGF_Comparer.Models;
+using ComparerLibrary;
 
-namespace CGF_Comparer
+namespace CFG_Comparer
 {
     public class Output
     {
