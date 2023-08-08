@@ -133,7 +133,7 @@ else
         </thead>
         
         <tbody>
-            @foreach (var item in allData2)
+            @foreach (var item in filteredData)
             {
                 <tr style="background-color: @(GetColor(item.Type.ToString()))">
                     <td>@item.ID</td>
@@ -153,7 +153,7 @@ else
 
 @code {
     private CfgModel allData = new();
-    private List<DataComparisonItem> allData2;    
+    private List<DataComparisonItem> filteredData;    
     string myValue;
     string[] filters;
     string[] sourceInfo = new string[0];
@@ -195,7 +195,7 @@ else
             return;
         }    
     }
-    public async Task UploadSource(InputFileChangeEventArgs e)
+    private async Task UploadSource(InputFileChangeEventArgs e)
     {
 
         var file = e.File;
@@ -293,7 +293,7 @@ else
         }
     }  
 
-    public async Task GetAll(string id = "", IEnumerable<string> filters = null)
+    private async Task GetAll(string id = "", IEnumerable<string> filters = null)
     {
         string apiUrl = "https://localhost:7219/api/CfgComparer/FilterByIdResults";
         using var httpClient = new HttpClient();        
@@ -307,7 +307,7 @@ else
             var jsonString = await response.Content.ReadAsStringAsync();
             try
             {
-                allData2 = JsonSerializer.Deserialize<List<DataComparisonItem>>(jsonString,new JsonSerializerOptions
+                filteredData = JsonSerializer.Deserialize<List<DataComparisonItem>>(jsonString,new JsonSerializerOptions
                     {
                     PropertyNameCaseInsensitive = true
                 });
@@ -319,7 +319,7 @@ else
         }
         else if(!response.IsSuccessStatusCode)
         {
-            allData2 = new List<DataComparisonItem>();
+            filteredData = new List<DataComparisonItem>();
 
             return;
         }
@@ -349,39 +349,5 @@ else
     protected override async Task OnInitializedAsync()
     {
         
-    }
-
-    /*
-    public class CfgModel
-    {
-        public CfgModel()
-        {
-            
-        }
-        public List<FileMetaInfo> SourceMetaInfo { get; set; } = new();
-        public List<FileMetaInfo> TargetMetaInfo { get; set; } = new();
-        public List<DataComparisonItem> ComparedData { get; set; } = new();
-    }
-
-    public class DataComparisonItem
-    {
-        public DataComparisonItem() { }
-        public string ID { get; set; }
-        public string SourceValue { get; set; } = string.Empty;
-        public string TargetValue { get; set; } = string.Empty;
-        public ResultsType Type { get; set; }
-    }
-    public class FileMetaInfo
-    {
-        public string ID { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-    }
-    public enum ResultsType
-    {
-        Unchanged,
-        Added,
-        Modified,
-        Removed
-    }
-    */
+    }    
 }
